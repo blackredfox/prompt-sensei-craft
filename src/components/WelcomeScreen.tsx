@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, Sparkles, Zap, Target, MessageSquare } from "lucide-react";
+import { Brain, Sparkles, Zap, Target, MessageSquare, Smile, Code2 } from "lucide-react";
 
 interface WelcomeScreenProps {
   onStart: () => void;
@@ -39,7 +39,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
         </div>
 
         {/* Features */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-12">
           <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-glow-secondary transition-all duration-300">
             <CardHeader className="text-center pb-4">
               <div className="mx-auto p-2 rounded-lg bg-gradient-secondary w-fit mb-3">
@@ -78,6 +78,34 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             <CardContent className="text-center">
               <p className="text-muted-foreground text-sm">
                 Get your optimized prompt in under 2 minutes with our guided process
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-glow-secondary transition-all duration-300">
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto p-2 rounded-lg bg-gradient-secondary w-fit mb-3">
+                <Smile className="w-6 h-6 text-accent-foreground" />
+              </div>
+              <CardTitle className="text-lg">Beginner Friendly</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground text-sm">
+                No jargon, no pressure — just choose and go. We guide you step by step.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-glow-secondary transition-all duration-300">
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto p-2 rounded-lg bg-gradient-secondary w-fit mb-3">
+                <Code2 className="w-6 h-6 text-accent-foreground" />
+              </div>
+              <CardTitle className="text-lg">Code-Ready Prompts</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground text-sm">
+                Generate clean, structured code with built-in formatting, explanations, and edge cases.
               </p>
             </CardContent>
           </Card>
