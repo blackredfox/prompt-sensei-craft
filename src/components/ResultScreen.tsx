@@ -7,6 +7,7 @@ import { PromptQualityMeter } from "./PromptQualityMeter";
 import { usePromptLibrary } from "@/hooks/usePromptLibrary";
 import { Copy, CheckCheck, RotateCcw, Lightbulb, Sparkles, ExternalLink, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { OpenInButtons } from "./OpenInButtons";
 
 interface ResultScreenProps {
   answers: PromptAnswers;
@@ -325,6 +326,13 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
 
           {/* Prompt Quality Meter */}
           <PromptQualityMeter prompt={prompt} answers={answers} />
+
+          {/* Open in AI Buttons */}
+          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <CardContent className="pt-6">
+              <OpenInButtons prompt={prompt} />
+            </CardContent>
+          </Card>
 
           {/* Explanation */}
           <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
