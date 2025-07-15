@@ -123,6 +123,16 @@ export function QuestionStep({
                   </CardContent>
                 </Card>
               ))}
+
+              {/* Tooltip for select questions */}
+              {question.tooltip && (
+                <div className="flex items-start gap-2 mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <HelpCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-muted-foreground">
+                    {question.tooltip}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PromptAnswers } from "./PromptSensei";
-import { Copy, CheckCheck, RotateCcw, Lightbulb, Sparkles } from "lucide-react";
+import { PromptAnswers, polishText } from "./PromptSensei";
+import { Copy, CheckCheck, RotateCcw, Lightbulb, Sparkles, ExternalLink, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ResultScreenProps {
@@ -40,14 +40,26 @@ function detectPersona(question: string): string {
   return "";
 }
 
-function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; explanation: string } {
-  const { question, audience, tone, format, complexity, depth } = answers;
+function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; explanation: string; polishInfo?: { original: string; polished: string } } {
+  const { question, audience, tone, format, complexity, depth, polishInput } = answers;
+  
+  // Polish the question if requested
+  let finalQuestion = question;
+  let polishInfo: { original: string; polished: string } | undefined;
+  
+  if (polishInput === "true") {
+    const { polished, wasPolished } = polishText(question);
+    if (wasPolished) {
+      polishInfo = { original: question, polished };
+      finalQuestion = polished;
+    }
+  }
   
   let prompt = "";
   let explanation = "";
 
   // Auto-detect persona first
-  const detectedPersona = detectPersona(question);
+  const detectedPersona = detectPersona(finalQuestion);
   if (detectedPersona && complexity === "optimize") {
     prompt += detectedPersona;
   } else if (complexity === "optimize") {
@@ -69,8 +81,8 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
   }
 
   // Add the main question
-  prompt += question.trim();
-  if (!question.trim().endsWith("?") && !question.trim().endsWith(".")) {
+  prompt += finalQuestion.trim();
+  if (!finalQuestion.trim().endsWith("?") && !finalQuestion.trim().endsWith(".")) {
     prompt += ".";
   }
 
@@ -155,14 +167,14 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
   
   explanation += `These elements work together to give you more relevant, well-structured responses that match your specific needs.`;
 
-  return { prompt, explanation };
+  return { prompt, explanation, polishInfo };
 }
 
 export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   
-  const { prompt, explanation } = generateOptimizedPrompt(answers);
+  const { prompt, explanation, polishInfo } = generateOptimizedPrompt(answers);
 
   const handleCopy = async () => {
     try {
@@ -180,6 +192,12 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
         variant: "destructive",
       });
     }
+  };
+
+  const handleOpenChatGPT = () => {
+    const encodedPrompt = encodeURIComponent(prompt);
+    const chatGPTUrl = `https://chat.openai.com/?prompt=${encodedPrompt}`;
+    window.open(chatGPTUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -201,6 +219,30 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
         </div>
 
         <div className="space-y-8">
+          {/* Polish Info Notice */}
+          {polishInfo && (
+            <Card className="border-border/50 bg-blue-50 dark:bg-blue-950/20 backdrop-blur-sm">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-2">
+                  <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                  <div className="space-y-2">
+                    <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                      ✨ We polished your question slightly to help the AI understand better:
+                    </p>
+                    <div className="text-xs space-y-1">
+                      <div className="text-muted-foreground">
+                        <span className="font-mono bg-background/50 px-2 py-1 rounded border">Original:</span> {polishInfo.original}
+                      </div>
+                      <div className="text-foreground">
+                        <span className="font-mono bg-primary/10 px-2 py-1 rounded border">Improved:</span> {polishInfo.polished}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Generated Prompt */}
           <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-glow-secondary">
             <CardHeader>
@@ -261,23 +303,34 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
               <RotateCcw className="w-4 h-4 mr-2" />
               Create Another Prompt
             </Button>
-            <Button
-              onClick={handleCopy}
-              size="lg"
-              className="bg-gradient-primary hover:shadow-glow-primary text-primary-foreground"
-            >
-              {copied ? (
-                <>
-                  <CheckCheck className="w-4 h-4 mr-2" />
-                  Copied to Clipboard
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copy Prompt
-                </>
-              )}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                onClick={handleCopy}
+                size="lg"
+                variant="outline"
+                className="border-border/50 hover:border-primary/50"
+              >
+                {copied ? (
+                  <>
+                    <CheckCheck className="w-4 h-4 mr-2" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy Prompt
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleOpenChatGPT}
+                size="lg"
+                className="bg-gradient-primary hover:shadow-glow-primary text-primary-foreground"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Open in ChatGPT
+              </Button>
+            </div>
           </div>
         </div>
       </div>

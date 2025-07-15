@@ -15,6 +15,55 @@ export interface PromptAnswers {
   format: string;
   complexity: string;
   depth?: string;
+  polishInput?: string; // "true" or "false" to match select options
+}
+
+// Grammar and polish utility functions
+export function polishText(text: string): { polished: string; wasPolished: boolean } {
+  const original = text.trim();
+  if (!original) return { polished: original, wasPolished: false };
+  
+  let polished = original;
+  let hasChanges = false;
+  
+  // Common fixes - array of [pattern, replacement] pairs
+  const fixes: [RegExp, string][] = [
+    [/\s+/g, ' '], // Multiple spaces to single space
+    [/\bi\b/g, 'I'], // Lowercase 'i' to 'I'
+    [/\bim\b/gi, "I'm"], // 'im' to "I'm"
+    [/\bdont\b/gi, "don't"], // 'dont' to "don't"
+    [/\bcant\b/gi, "can't"], // 'cant' to "can't"
+    [/\bwont\b/gi, "won't"], // 'wont' to "won't"
+    [/\bisnt\b/gi, "isn't"], // 'isnt' to "isn't"
+    [/\barent\b/gi, "aren't"], // 'arent' to "aren't"
+    [/\bsaj\b/gi, "say"], // Common typo
+    [/\bto do not\b/gi, "not to"], // Grammar fix
+    [/\bwow can i\b/gi, "How can I"], // Common start
+  ];
+  
+  fixes.forEach(([pattern, replacement]) => {
+    const newText = polished.replace(pattern, replacement);
+    if (newText !== polished) {
+      hasChanges = true;
+      polished = newText;
+    }
+  });
+  
+  // Capitalize first letter
+  if (polished && polished[0] !== polished[0].toUpperCase()) {
+    polished = polished[0].toUpperCase() + polished.slice(1);
+    hasChanges = true;
+  }
+  
+  // Ensure proper sentence ending
+  if (polished && !/[.!?]$/.test(polished)) {
+    polished += polished.includes('?') || polished.toLowerCase().startsWith('how') || 
+               polished.toLowerCase().startsWith('what') || polished.toLowerCase().startsWith('why') ||
+               polished.toLowerCase().startsWith('when') || polished.toLowerCase().startsWith('where') ? '?' : '.';
+    hasChanges = true;
+  }
+  
+  return { polished, wasPolished: hasChanges };
 }
 
 const questions = [
@@ -31,6 +80,7 @@ const questions = [
     title: "Who is the answer for?",
     subtitle: "This helps me tailor the language and detail level",
     type: "select" as const,
+    tooltip: "Clients prefer polished and persuasive language, while personal use can be more casual and detailed",
     options: [
       { value: "myself", label: "Myself", description: "Personal use or learning" },
       { value: "client", label: "My client", description: "Professional deliverable" },
@@ -43,6 +93,7 @@ const questions = [
     title: "What tone or style do you prefer?",
     subtitle: "Tone controls how formal, casual or emotional the response sounds",
     type: "select" as const,
+    tooltip: "Friendly = casual and warm. Expert = formal and authoritative. Short = concise and direct. Creative = imaginative and engaging",
     options: [
       { value: "friendly", label: "Friendly", description: "Conversational and approachable" },
       { value: "expert", label: "Expert", description: "Professional and authoritative" },
@@ -55,6 +106,7 @@ const questions = [
     title: "What format would be best?",
     subtitle: "How would you like the information structured?",
     type: "select" as const,
+    tooltip: "Bullet = overview and key points. Steps = process and tutorials. Paragraph = essay-style detailed explanations",
     options: [
       { value: "bullet", label: "Bullet list", description: "Great for summaries or key points" },
       { value: "steps", label: "Step-by-step", description: "Perfect for tutorials or walkthroughs" },
@@ -66,6 +118,7 @@ const questions = [
     title: "How smart should I make this prompt?",
     subtitle: "Choose based on your AI experience level",
     type: "select" as const,
+    tooltip: "Optimize adds structure, examples, and expert tone for better results. Keep it simple for straightforward responses",
     options: [
       { value: "optimize", label: "Make it smarter", description: "Add context, examples, and detailed instructions" },
       { value: "simple", label: "I'm new — keep it clear", description: "Direct and straightforward approach" }
@@ -76,9 +129,21 @@ const questions = [
     title: "Would you like the AI to go deeper?",
     subtitle: "Choose how thorough you want the AI's analysis to be",
     type: "select" as const,
+    tooltip: "DeepSearch enables analytical thinking, comparisons, and research-based insights",
     options: [
       { value: "deep", label: "🔎 DeepSearch", description: "Let the AI explore sources, trends, comparisons, and give a smart, thoughtful response" },
       { value: "simple", label: "🎯 Keep it Simple", description: "Just answer my question clearly" }
+    ]
+  },
+  {
+    id: "polishInput",
+    title: "Polish my input automatically?",
+    subtitle: "Help improve grammar and clarity of your question",
+    type: "select" as const,
+    tooltip: "We'll gently fix common grammar mistakes and improve clarity while preserving your meaning",
+    options: [
+      { value: "true", label: "✨ Polish it", description: "Fix grammar and improve clarity automatically" },
+      { value: "false", label: "💭 Keep as-is", description: "Use my exact wording" }
     ]
   }
 ];
@@ -155,13 +220,13 @@ export function PromptSensei() {
 
         <QuestionStep
           question={currentQuestion}
-          answer={answers[currentQuestion.id as keyof PromptAnswers] || ""}
+          answer={answers[currentQuestion.id as keyof PromptAnswers] as string || ""}
           onAnswer={(value) => handleAnswer(currentQuestion.id, value)}
           onNext={handleNext}
           onBack={handleBack}
           isFirstStep={currentStep === 1}
           isLastStep={currentStep === questions.length}
-          allAnswers={answers}
+          allAnswers={answers as Record<string, string>}
         />
       </div>
     </div>
