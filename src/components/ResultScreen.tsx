@@ -43,7 +43,7 @@ function detectPersona(question: string): string {
 }
 
 function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; explanation: string; polishInfo?: { original: string; polished: string } } {
-  const { question, audience, tone, format, complexity, depth, polishInput } = answers;
+  const { question, audience, tone, format, complexity, depth, polishInput, insightMode, language } = answers;
   
   // Polish the question if requested
   let finalQuestion = question;
@@ -153,6 +153,23 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
     }
   }
 
+  // Add Deep Insight Mode
+  if (insightMode === "deep") {
+    prompt += " Analyze deeply. Compare perspectives. Provide real-world examples and reasoning behind your answer.";
+  }
+
+  // Add language preference
+  if (language && language !== "auto") {
+    const languageMap: Record<string, string> = {
+      english: "English",
+      spanish: "Spanish", 
+      french: "French",
+      russian: "Russian"
+    };
+    const targetLanguage = languageMap[language] || language;
+    prompt += ` Respond in ${targetLanguage}. Use clear, fluent ${targetLanguage} appropriate for a ${language === 'english' ? 'native' : 'non-native'} speaker.`;
+  }
+
   // Generate explanation
   explanation = `Here's why this prompt hits the mark:\n\n`;
   
@@ -176,6 +193,21 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
 
   if (depth === "deep") {
     explanation += `• **DeepSearch Mode**: I enabled thorough analysis with research-based insights, comparisons, and real-world examples for comprehensive responses.\n\n`;
+  }
+
+  if (insightMode === "deep") {
+    explanation += `• **Deep Insight Mode**: I added instructions for the AI to analyze deeply, compare perspectives, and provide real-world examples for better reasoning.\n\n`;
+  }
+
+  if (language && language !== "auto") {
+    const languageMap: Record<string, string> = {
+      english: "English",
+      spanish: "Spanish", 
+      french: "French",
+      russian: "Russian"
+    };
+    const targetLanguage = languageMap[language] || language;
+    explanation += `• **Language Setting**: I specified that the response should be in ${targetLanguage} for better accessibility.\n\n`;
   }
   
   explanation += `These elements work together to give you more relevant, well-structured responses that match your specific needs.`;

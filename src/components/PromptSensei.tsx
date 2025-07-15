@@ -16,6 +16,8 @@ export interface PromptAnswers {
   complexity: string;
   depth?: string;
   polishInput?: string; // "true" or "false" to match select options
+  insightMode?: string;
+  language?: string;
 }
 
 // Grammar and polish utility functions
@@ -145,6 +147,31 @@ const questions = [
     options: [
       { value: "true", label: "✨ Polish it", description: "Fix grammar and improve clarity automatically" },
       { value: "false", label: "💭 Keep as-is", description: "Use my exact wording" }
+    ]
+  },
+  {
+    id: "insightMode",
+    title: "Would you like deeper reasoning in your answer?",
+    subtitle: "Choose how analytical you want the AI's response to be",
+    type: "select" as const,
+    tooltip: "Deep Insight helps you get better analytical responses — ideal for complex topics, strategy, or research",
+    options: [
+      { value: "deep", label: "🔍 Deep Insight", description: "Ask the AI to analyze deeply, compare views, and provide real examples" },
+      { value: "simple", label: "💬 Just Answer", description: "Keep it clear and to the point" }
+    ]
+  },
+  {
+    id: "language",
+    title: "What language should the AI respond in?",
+    subtitle: "Choose your preferred response language",
+    type: "select" as const,
+    tooltip: "Choose the language you'd like the AI to respond in. You can also let the system detect it automatically",
+    options: [
+      { value: "english", label: "English", description: "Respond in English" },
+      { value: "spanish", label: "Spanish", description: "Respond in Spanish" },
+      { value: "french", label: "French", description: "Respond in French" },
+      { value: "russian", label: "Russian", description: "Respond in Russian" },
+      { value: "auto", label: "Auto-detect", description: "Detect language from question" }
     ]
   }
 ];
