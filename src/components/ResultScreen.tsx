@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PromptAnswers, polishText } from "./PromptSensei";
+import { PromptQualityMeter } from "./PromptQualityMeter";
+import { usePromptLibrary } from "@/hooks/usePromptLibrary";
 import { Copy, CheckCheck, RotateCcw, Lightbulb, Sparkles, ExternalLink, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -173,6 +175,7 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
 export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+  const { savePrompt } = usePromptLibrary();
   
   const { prompt, explanation, polishInfo } = generateOptimizedPrompt(answers);
 
@@ -276,6 +279,9 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
               </div>
             </CardContent>
           </Card>
+
+          {/* Prompt Quality Meter */}
+          <PromptQualityMeter prompt={prompt} answers={answers} />
 
           {/* Explanation */}
           <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
