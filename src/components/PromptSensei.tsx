@@ -80,11 +80,12 @@ const questions = [
     title: "Who is the answer for?",
     subtitle: "This helps me tailor the language and detail level",
     type: "select" as const,
-    tooltip: "Clients prefer polished and persuasive language, while personal use can be more casual and detailed",
+    tooltip: "Clients prefer polished and persuasive language, while personal use can be more casual. Choose Code Generation if you're using AI to write, refactor, or explain code — includes technical guidance and structured output",
     options: [
       { value: "myself", label: "Myself", description: "Personal use or learning" },
       { value: "client", label: "My client", description: "Professional deliverable" },
       { value: "manager", label: "My manager", description: "Work presentation or report" },
+      { value: "code", label: "Code Generation", description: "Writing prompts for AI to generate or explain code" },
       { value: "other", label: "Other", description: "General audience" }
     ]
   },

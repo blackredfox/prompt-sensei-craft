@@ -100,6 +100,9 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
       case "myself":
         prompt += " This is for my personal understanding, so feel free to include detailed explanations and context.";
         break;
+      case "code":
+        prompt += " You are a senior software engineer. Please write clean, well-documented code, and include comments and explanations where relevant.";
+        break;
       case "other":
         prompt += " Please make the response accessible to a general audience.";
         break;
@@ -112,7 +115,11 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
       prompt += " Please format your response as a clear bullet list with key points.";
       break;
     case "steps":
-      prompt += " Please provide a step-by-step response with numbered instructions.";
+      if (audience === "code") {
+        prompt += " Break down your response into logical code blocks and describe each step clearly.";
+      } else {
+        prompt += " Please provide a step-by-step response with numbered instructions.";
+      }
       break;
     case "paragraph":
       prompt += " Please provide a detailed response in paragraph format.";
@@ -139,7 +146,11 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
 
   // Add DeepSearch modifier
   if (depth === "deep") {
-    prompt += " Include research-based insights, comparisons, references, or real-world examples as needed. Analyze the topic broadly and provide thorough explanations.";
+    if (audience === "code") {
+      prompt += " Include edge cases, performance considerations, and best practices if applicable. Analyze the topic broadly and provide thorough explanations.";
+    } else {
+      prompt += " Include research-based insights, comparisons, references, or real-world examples as needed. Analyze the topic broadly and provide thorough explanations.";
+    }
   }
 
   // Generate explanation
@@ -154,7 +165,7 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
   explanation += `• **Clear Intent**: Your core question is stated directly and clearly.\n\n`;
   
   if (complexity === "optimize") {
-    explanation += `• **Audience Context**: I specified that this is for ${audience === "myself" ? "personal use" : audience === "client" ? "a client" : audience === "manager" ? "management" : "a general audience"}, which helps the AI tailor the complexity and tone.\n\n`;
+    explanation += `• **Audience Context**: I specified that this is for ${audience === "myself" ? "personal use" : audience === "client" ? "a client" : audience === "manager" ? "management" : audience === "code" ? "code generation with technical guidance" : "a general audience"}, which helps the AI tailor the complexity and tone.\n\n`;
   }
   
   explanation += `• **Format Specification**: I requested ${format === "bullet" ? "bullet points" : format === "steps" ? "step-by-step format" : "paragraph format"} to match your preference.\n\n`;
