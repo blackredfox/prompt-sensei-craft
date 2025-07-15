@@ -11,14 +11,47 @@ interface ResultScreenProps {
   onRestart: () => void;
 }
 
+// Auto-detect and suggest persona based on question content
+function detectPersona(question: string): string {
+  const lowerQuestion = question.toLowerCase();
+  
+  if (lowerQuestion.includes('etsy') || lowerQuestion.includes('shop') || lowerQuestion.includes('ecommerce') || lowerQuestion.includes('e-commerce')) {
+    return "Act as an experienced e-commerce coach specializing in online marketplaces. ";
+  }
+  if (lowerQuestion.includes('finance') || lowerQuestion.includes('money') || lowerQuestion.includes('investment') || lowerQuestion.includes('budget')) {
+    return "You are a certified financial advisor with expertise in personal finance and investment strategies. ";
+  }
+  if (lowerQuestion.includes('marketing') || lowerQuestion.includes('promotion') || lowerQuestion.includes('advertising')) {
+    return "Act as a digital marketing expert with proven experience in campaign strategy and audience engagement. ";
+  }
+  if (lowerQuestion.includes('code') || lowerQuestion.includes('programming') || lowerQuestion.includes('developer') || lowerQuestion.includes('software')) {
+    return "You are a senior software engineer with extensive experience in modern development practices. ";
+  }
+  if (lowerQuestion.includes('resume') || lowerQuestion.includes('cv') || lowerQuestion.includes('job') || lowerQuestion.includes('career')) {
+    return "Act as a professional career coach and HR expert with extensive experience in recruitment and career development. ";
+  }
+  if (lowerQuestion.includes('health') || lowerQuestion.includes('fitness') || lowerQuestion.includes('exercise') || lowerQuestion.includes('nutrition')) {
+    return "You are a certified health and wellness expert with a background in nutrition and fitness coaching. ";
+  }
+  if (lowerQuestion.includes('business') || lowerQuestion.includes('startup') || lowerQuestion.includes('entrepreneur')) {
+    return "Act as a business strategy consultant with experience helping startups and established companies grow. ";
+  }
+  
+  return "";
+}
+
 function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; explanation: string } {
-  const { question, audience, tone, format, complexity } = answers;
+  const { question, audience, tone, format, complexity, depth } = answers;
   
   let prompt = "";
   let explanation = "";
 
-  // Start with role/context based on complexity
-  if (complexity === "optimize") {
+  // Auto-detect persona first
+  const detectedPersona = detectPersona(question);
+  if (detectedPersona && complexity === "optimize") {
+    prompt += detectedPersona;
+  } else if (complexity === "optimize") {
+    // Fallback to general tone-based persona
     switch (tone) {
       case "expert":
         prompt += "You are an expert consultant with deep knowledge in your field. ";
@@ -90,10 +123,17 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
     }
   }
 
+  // Add DeepSearch modifier
+  if (depth === "deep") {
+    prompt += " Include research-based insights, comparisons, references, or real-world examples as needed. Analyze the topic broadly and provide thorough explanations.";
+  }
+
   // Generate explanation
-  explanation = `This prompt was optimized with several key elements:\n\n`;
+  explanation = `Here's why this prompt hits the mark:\n\n`;
   
-  if (complexity === "optimize") {
+  if (detectedPersona && complexity === "optimize") {
+    explanation += `• **Smart Persona Detection**: I automatically detected your topic and assigned a specialized expert role to ensure authoritative, relevant responses.\n\n`;
+  } else if (complexity === "optimize") {
     explanation += `• **Role Definition**: I set up the AI with a specific persona (${tone}) to ensure consistent voice throughout the response.\n\n`;
   }
   
@@ -107,6 +147,10 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
   
   if (complexity === "optimize") {
     explanation += `• **Tone Guidance**: I added specific instructions to maintain a ${tone} approach throughout the response.\n\n`;
+  }
+
+  if (depth === "deep") {
+    explanation += `• **DeepSearch Mode**: I enabled thorough analysis with research-based insights, comparisons, and real-world examples for comprehensive responses.\n\n`;
   }
   
   explanation += `These elements work together to give you more relevant, well-structured responses that match your specific needs.`;
@@ -196,7 +240,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Lightbulb className="w-5 h-5 text-primary" />
-                <CardTitle className="text-lg">Why This Works</CardTitle>
+                <CardTitle className="text-lg">Here's why this prompt hits the mark</CardTitle>
               </div>
             </CardHeader>
             <CardContent>

@@ -14,6 +14,7 @@ export interface PromptAnswers {
   tone: string;
   format: string;
   complexity: string;
+  depth?: string;
 }
 
 const questions = [
@@ -22,7 +23,8 @@ const questions = [
     title: "What do you want to ask the AI?",
     subtitle: "Be as specific as possible about what you need help with",
     type: "textarea" as const,
-    placeholder: "e.g., Help me write a marketing email for my new product launch..."
+    placeholder: "e.g., Help me write a marketing email for my new product launch...",
+    tooltip: "💡 Tip: The more details you provide, the more helpful the AI can be. Instead of 'Write resume', try 'Write resume for a junior frontend developer in fintech.'"
   },
   {
     id: "audience",
@@ -39,7 +41,7 @@ const questions = [
   {
     id: "tone",
     title: "What tone or style do you prefer?",
-    subtitle: "Choose the voice that fits your needs",
+    subtitle: "Tone controls how formal, casual or emotional the response sounds",
     type: "select" as const,
     options: [
       { value: "friendly", label: "Friendly", description: "Conversational and approachable" },
@@ -54,25 +56,35 @@ const questions = [
     subtitle: "How would you like the information structured?",
     type: "select" as const,
     options: [
-      { value: "bullet", label: "Bullet list", description: "Easy to scan key points" },
-      { value: "steps", label: "Step-by-step", description: "Sequential instructions" },
+      { value: "bullet", label: "Bullet list", description: "Great for summaries or key points" },
+      { value: "steps", label: "Step-by-step", description: "Perfect for tutorials or walkthroughs" },
       { value: "paragraph", label: "Paragraph", description: "Detailed explanation" }
     ]
   },
   {
     id: "complexity",
-    title: "Should I optimize this prompt or keep it simple?",
+    title: "How smart should I make this prompt?",
     subtitle: "Choose based on your AI experience level",
     type: "select" as const,
     options: [
-      { value: "optimize", label: "Optimize", description: "Add context, examples, and detailed instructions" },
-      { value: "simple", label: "Keep simple", description: "Direct and straightforward approach" }
+      { value: "optimize", label: "Make it smarter", description: "Add context, examples, and detailed instructions" },
+      { value: "simple", label: "I'm new — keep it clear", description: "Direct and straightforward approach" }
+    ]
+  },
+  {
+    id: "depth",
+    title: "Would you like the AI to go deeper?",
+    subtitle: "Choose how thorough you want the AI's analysis to be",
+    type: "select" as const,
+    options: [
+      { value: "deep", label: "🔎 DeepSearch", description: "Let the AI explore sources, trends, comparisons, and give a smart, thoughtful response" },
+      { value: "simple", label: "🎯 Keep it Simple", description: "Just answer my question clearly" }
     ]
   }
 ];
 
 export function PromptSensei() {
-  const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1-5 = questions, 6 = result
+  const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1-6 = questions, 7 = result
   const [answers, setAnswers] = useState<Partial<PromptAnswers>>({});
 
   const handleStart = () => {
@@ -149,6 +161,7 @@ export function PromptSensei() {
           onBack={handleBack}
           isFirstStep={currentStep === 1}
           isLastStep={currentStep === questions.length}
+          allAnswers={answers}
         />
       </div>
     </div>

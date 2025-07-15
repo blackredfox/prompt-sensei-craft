@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, HelpCircle, AlertTriangle } from "lucide-react";
 
 interface Question {
   id: string;
@@ -9,6 +9,7 @@ interface Question {
   subtitle: string;
   type: "textarea" | "select";
   placeholder?: string;
+  tooltip?: string;
   options?: {
     value: string;
     label: string;
@@ -24,6 +25,7 @@ interface QuestionStepProps {
   onBack: () => void;
   isFirstStep: boolean;
   isLastStep: boolean;
+  allAnswers?: Record<string, string>;
 }
 
 export function QuestionStep({
@@ -33,9 +35,29 @@ export function QuestionStep({
   onNext,
   onBack,
   isFirstStep,
-  isLastStep
+  isLastStep,
+  allAnswers = {}
 }: QuestionStepProps) {
   const canProceed = answer.trim().length > 0;
+
+  // Adaptive feedback logic
+  const getAdaptiveFeedback = () => {
+    if (question.id === "tone" && allAnswers.audience === "manager" && answer === "friendly") {
+      return {
+        type: "suggestion",
+        message: "💼 Would you prefer to keep it more professional? That's often better for manager-level communication."
+      };
+    }
+    if (question.id === "tone" && allAnswers.audience === "client" && answer === "short") {
+      return {
+        type: "suggestion", 
+        message: "📋 Consider 'Expert' tone for client work - it builds confidence and trust."
+      };
+    }
+    return null;
+  };
+
+  const adaptiveFeedback = getAdaptiveFeedback();
 
   return (
     <div className="space-y-8">
@@ -58,6 +80,14 @@ export function QuestionStep({
                 placeholder={question.placeholder}
                 className="min-h-32 resize-none border-border/50 bg-background/50 focus:border-primary focus:ring-primary text-lg"
               />
+              {question.tooltip && (
+                <div className="flex items-start gap-2 mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <HelpCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-muted-foreground">
+                    {question.tooltip}
+                  </p>
+                </div>
+              )}
               <p className="text-sm text-muted-foreground mt-2">
                 Be as detailed as possible for better results
               </p>
@@ -95,6 +125,16 @@ export function QuestionStep({
               ))}
             </div>
           )}
+
+          {/* Adaptive Feedback */}
+          {adaptiveFeedback && answer && (
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800">
+              <AlertTriangle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-orange-700 dark:text-orange-300">
+                {adaptiveFeedback.message}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -120,7 +160,7 @@ export function QuestionStep({
         >
           {isLastStep ? (
             <>
-              Generate Prompt
+              Show me my perfect prompt
               <ArrowRight className="w-4 h-4 ml-2" />
             </>
           ) : (
