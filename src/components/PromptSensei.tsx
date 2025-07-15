@@ -165,13 +165,16 @@ const questions = [
     title: "What language should the AI respond in?",
     subtitle: "Choose your preferred response language",
     type: "select" as const,
-    tooltip: "Choose the language you'd like the AI to respond in. You can also let the system detect it automatically",
+    tooltip: "You can write your input in any language. The AI will be instructed to respond in your selected language with proper cultural context and native-like fluency.",
     options: [
-      { value: "english", label: "English", description: "Respond in English" },
-      { value: "spanish", label: "Spanish", description: "Respond in Spanish" },
-      { value: "french", label: "French", description: "Respond in French" },
-      { value: "russian", label: "Russian", description: "Respond in Russian" },
-      { value: "auto", label: "Auto-detect", description: "Detect language from question" }
+      { value: "english", label: "🇺🇸 English", description: "Respond in English" },
+      { value: "spanish", label: "🇪🇸 Spanish", description: "Respond in Spanish" },
+      { value: "french", label: "🇫🇷 French", description: "Respond in French" },
+      { value: "german", label: "🇩🇪 German", description: "Respond in German" },
+      { value: "russian", label: "🇷🇺 Russian", description: "Respond in Russian" },
+      { value: "chinese", label: "🇨🇳 Chinese", description: "Respond in Chinese" },
+      { value: "japanese", label: "🇯🇵 Japanese", description: "Respond in Japanese" },
+      { value: "auto", label: "🌐 Auto-detect", description: "Detect language from question" }
     ]
   }
 ];

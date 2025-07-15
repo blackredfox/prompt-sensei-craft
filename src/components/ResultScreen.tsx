@@ -159,16 +159,24 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
     prompt += " Analyze deeply. Compare perspectives. Provide real-world examples and reasoning behind your answer.";
   }
 
-  // Add language preference
+  // Add language preference with enhanced instructions
   if (language && language !== "auto") {
     const languageMap: Record<string, string> = {
       english: "English",
       spanish: "Spanish", 
       french: "French",
-      russian: "Russian"
+      german: "German",
+      russian: "Russian",
+      chinese: "Chinese",
+      japanese: "Japanese"
     };
     const targetLanguage = languageMap[language] || language;
-    prompt += ` Respond in ${targetLanguage}. Use clear, fluent ${targetLanguage} appropriate for a ${language === 'english' ? 'native' : 'non-native'} speaker.`;
+    
+    if (language === "english") {
+      prompt += ` Respond in clear, fluent English.`;
+    } else {
+      prompt += ` IMPORTANT: Respond entirely in ${targetLanguage}. Use native-level ${targetLanguage} with proper grammar, cultural context, and idiomatic expressions. If the original question was in English or another language, translate your understanding and respond completely in ${targetLanguage}. Ensure all explanations, examples, and details are culturally appropriate for ${targetLanguage} speakers.`;
+    }
   }
 
   // Generate explanation
@@ -205,10 +213,17 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
       english: "English",
       spanish: "Spanish", 
       french: "French",
-      russian: "Russian"
+      german: "German",
+      russian: "Russian",
+      chinese: "Chinese",
+      japanese: "Japanese"
     };
     const targetLanguage = languageMap[language] || language;
-    explanation += `• **Language Setting**: I specified that the response should be in ${targetLanguage} for better accessibility.\n\n`;
+    if (language === "english") {
+      explanation += `• **Language Setting**: I ensured the response will be in clear, fluent English.\n\n`;
+    } else {
+      explanation += `• **Enhanced Multilingual Support**: I added strong instructions for the AI to respond entirely in ${targetLanguage} with native-level fluency, proper cultural context, and idiomatic expressions. This ensures authentic communication regardless of your input language.\n\n`;
+    }
   }
   
   explanation += `These elements work together to give you more relevant, well-structured responses that match your specific needs.`;
