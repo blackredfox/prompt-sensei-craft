@@ -1,1 +1,13 @@
 project_id = "azfpisirgvrosciqhlss"
+
+[functions.translate-prompt]
+verify_jwt = false
+
+[functions.save-prompt]  
+verify_jwt = true
+
+[functions.create-checkout-session]
+verify_jwt = true
+
+[functions.check-subscription]
+verify_jwt = true
