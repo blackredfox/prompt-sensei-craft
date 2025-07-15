@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, Sparkles, Zap, Target, MessageSquare, Smile, Code2 } from "lucide-react";
+import { Brain, Sparkles, Zap, Target, MessageSquare, Smile, Code2, SearchCheck, Languages } from "lucide-react";
 
 interface WelcomeScreenProps {
   onStart: () => void;
@@ -39,7 +39,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
         </div>
 
         {/* Features */}
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-12">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-7 gap-6 mb-12">
           <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-glow-secondary transition-all duration-300">
             <CardHeader className="text-center pb-4">
               <div className="mx-auto p-2 rounded-lg bg-gradient-secondary w-fit mb-3">
@@ -106,6 +106,34 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             <CardContent className="text-center">
               <p className="text-muted-foreground text-sm">
                 Generate clean, structured code with built-in formatting, explanations, and edge cases.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-glow-secondary transition-all duration-300">
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto p-2 rounded-lg bg-gradient-secondary w-fit mb-3">
+                <SearchCheck className="w-6 h-6 text-accent-foreground" />
+              </div>
+              <CardTitle className="text-lg">Deep Insight Mode</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground text-sm">
+                Ask the AI to analyze, compare, and synthesize like a pro. Perfect for research, strategy, and long-form queries.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-glow-secondary transition-all duration-300">
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto p-2 rounded-lg bg-gradient-secondary w-fit mb-3">
+                <Languages className="w-6 h-6 text-accent-foreground" />
+              </div>
+              <CardTitle className="text-lg">Multilingual Friendly</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground text-sm">
+                Create prompts in your native language. Perfect for ESL users, international teams, and cross-language tasks.
               </p>
             </CardContent>
           </Card>
