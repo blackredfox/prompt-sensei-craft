@@ -375,34 +375,24 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
               <RotateCcw className="w-4 h-4 mr-2" />
               Create Another Prompt
             </Button>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                onClick={handleCopy}
-                size="lg"
-                variant="outline"
-                className="border-border/50 hover:border-primary/50"
-              >
-                {copied ? (
-                  <>
-                    <CheckCheck className="w-4 h-4 mr-2" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy Prompt
-                  </>
-                )}
-              </Button>
-              <Button
-                onClick={handleOpenChatGPT}
-                size="lg"
-                className="bg-gradient-primary hover:shadow-glow-primary text-primary-foreground"
-              >
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Open in ChatGPT
-              </Button>
-            </div>
+            <Button
+              onClick={handleCopy}
+              size="lg"
+              variant="outline"
+              className="border-border/50 hover:border-primary/50"
+            >
+              {copied ? (
+                <>
+                  <CheckCheck className="w-4 h-4 mr-2" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy Prompt
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </div>

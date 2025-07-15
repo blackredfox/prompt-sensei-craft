@@ -50,45 +50,40 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
       
       <div className="flex flex-wrap gap-3 justify-center">
         <Button
-          variant="outline"
           onClick={() => openIn("chatgpt")}
-          className="border-border/50 hover:border-green-500/50 hover:text-green-600 dark:hover:text-green-400"
+          className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
         >
           <MessageSquare className="w-4 h-4 mr-2" />
           Open in ChatGPT
         </Button>
         
         <Button
-          variant="outline"
           onClick={() => openIn("gemini")}
-          className="border-border/50 hover:border-blue-500/50 hover:text-blue-600 dark:hover:text-blue-400"
+          className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
         >
           <Brain className="w-4 h-4 mr-2" />
           Open in Gemini
         </Button>
         
         <Button
-          variant="outline"
           onClick={copyForClaude}
-          className="border-border/50 hover:border-orange-500/50 hover:text-orange-600 dark:hover:text-orange-400"
+          className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
         >
           <Copy className="w-4 h-4 mr-2" />
           Copy for Claude
         </Button>
         
         <Button
-          variant="outline"
           onClick={() => openIn("perplexity")}
-          className="border-border/50 hover:border-purple-500/50 hover:text-purple-600 dark:hover:text-purple-400"
+          className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
         >
           <Search className="w-4 h-4 mr-2" />
           Open in Perplexity
         </Button>
         
         <Button
-          variant="outline"
           onClick={() => openIn("you")}
-          className="border-border/50 hover:border-cyan-500/50 hover:text-cyan-600 dark:hover:text-cyan-400"
+          className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
         >
           <Globe className="w-4 h-4 mr-2" />
           Open in You.com
