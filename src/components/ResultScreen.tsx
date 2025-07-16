@@ -5,9 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { PromptAnswers, polishText } from "./PromptSensei";
 import { PromptQualityMeter } from "./PromptQualityMeter";
 import { usePromptLibrary } from "@/hooks/usePromptLibrary";
-import { Copy, CheckCheck, RotateCcw, Lightbulb, Sparkles, ExternalLink, Info } from "lucide-react";
+import { Copy, CheckCheck, RotateCcw, Lightbulb, Sparkles, ExternalLink, Info, Wand2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { OpenInButtons } from "./OpenInButtons";
+import { askOpenAI } from "@/services/prompt-service";
 
 interface ResultScreenProps {
   answers: PromptAnswers;
@@ -233,6 +234,9 @@ function generateOptimizedPrompt(answers: PromptAnswers): { prompt: string; expl
 
 export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
   const [copied, setCopied] = useState(false);
+  const [aiResponse, setAiResponse] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { savePrompt } = usePromptLibrary();
   
@@ -260,6 +264,45 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
     const encodedPrompt = encodeURIComponent(prompt);
     const chatGPTUrl = `https://chat.openai.com/?prompt=${encodedPrompt}`;
     window.open(chatGPTUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleTestWithAI = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Get language preference
+      const languageMap: Record<string, string> = {
+        english: "English",
+        spanish: "Spanish", 
+        french: "French",
+        german: "German",
+        russian: "Russian",
+        chinese: "Chinese",
+        japanese: "Japanese"
+      };
+      
+      const targetLanguage = answers.language && answers.language !== "auto" 
+        ? languageMap[answers.language] || "English"
+        : "English";
+      
+      const response = await askOpenAI(prompt, targetLanguage);
+      setAiResponse(response);
+      
+      toast({
+        title: "AI response generated!",
+        description: "Your prompt worked successfully.",
+      });
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+      toast({
+        title: "Error",
+        description: "Failed to get AI response. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -341,6 +384,59 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
 
           {/* Prompt Quality Meter */}
           <PromptQualityMeter prompt={prompt} answers={answers} />
+
+          {/* Test with AI */}
+          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Wand2 className="w-5 h-5 text-primary" />
+                  <CardTitle className="text-lg">Test Your Prompt</CardTitle>
+                </div>
+                <Button
+                  onClick={handleTestWithAI}
+                  disabled={loading}
+                  variant="outline"
+                  size="sm"
+                  className="border-border/50 hover:border-primary/50"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Thinking...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-4 h-4 mr-2" />
+                      Test with AI
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {error && (
+                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm mb-4">
+                  {error}
+                </div>
+              )}
+              
+              {aiResponse && (
+                <div className="p-4 rounded-lg bg-background/50 border border-border/50">
+                  <p className="text-sm text-muted-foreground mb-2">AI Response:</p>
+                  <div className="text-foreground leading-relaxed whitespace-pre-wrap">
+                    {aiResponse}
+                  </div>
+                </div>
+              )}
+              
+              {!aiResponse && !loading && (
+                <p className="text-muted-foreground text-sm">
+                  Click "Test with AI" to see how your optimized prompt performs with our AI model.
+                </p>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Open in AI Buttons */}
           <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
