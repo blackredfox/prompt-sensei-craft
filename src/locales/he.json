@@ -168,5 +168,16 @@
   "open_in_perplexity": "פתח ב-Perplexity",
   "open_in_you": "פתח ב-You.com",
   "prompt_copied": "פרומפט הועתק!",
-  "ready_paste_claude": "מוכן להדבקה ב-Claude.ai"
+  "ready_paste_claude": "מוכן להדבקה ב-Claude.ai",
+  "adaptive_feedback_manager_professional": "💼 האם אתה מעדיף לשמור על טון יותר מקצועי? זה לעתים קרובות טוב יותר לתקשורת ברמת ההנהלה.",
+  "adaptive_feedback_client_expert": "📋 שקול טון 'מומחה' לעבודה עם לקוחות - זה בונה אמון.",
+  "prompt_quality_score": "ציון איכות הפרומפט",
+  "score": "ציון",
+  "length_detail": "אורך ופרטים",
+  "expert_role": "תפקיד מומחה",
+  "format_clarity": "בהירות פורמט",
+  "specificity": "ספציפיות",
+  "ways_to_improve": "דרכים לשפר את הפרומפט שלך",
+  "excellent_prompt": "פרומפט מעולה",
+  "excellent_prompt_desc": "זה אמור לייצר תגובות איכותיות וממוקדות מכל עוזר AI."
 }

@@ -22,7 +22,9 @@ export function LanguageSwitcher() {
     { code: 'de', label: '🇩🇪 Deutsch', name: 'German' },
     { code: 'fr', label: '🇫🇷 Français', name: 'French' },
     { code: 'zh', label: '🇨🇳 中文', name: 'Chinese' },
-    { code: 'ar', label: '🇸🇦 العربية', name: 'Arabic' }
+    { code: 'ar', label: '🇸🇦 العربية', name: 'Arabic' },
+    { code: 'ja', label: '🇯🇵 日本語', name: 'Japanese' },
+    { code: 'he', label: '🇮🇱 עברית', name: 'Hebrew' }
   ];
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];

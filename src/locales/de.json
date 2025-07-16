@@ -168,5 +168,16 @@
   "open_in_perplexity": "In Perplexity öffnen",
   "open_in_you": "In You.com öffnen",
   "prompt_copied": "Prompt kopiert!",
-  "ready_paste_claude": "Bereit zum Einfügen in Claude.ai"
+  "ready_paste_claude": "Bereit zum Einfügen in Claude.ai",
+  "adaptive_feedback_manager_professional": "💼 Möchtest du es professioneller halten? Das ist oft besser für Manager-Kommunikation.",
+  "adaptive_feedback_client_expert": "📋 Erwäge den 'Experten'-Ton für Kundenarbeit - das schafft Vertrauen.",
+  "prompt_quality_score": "Prompt-Qualitätsbewertung",
+  "score": "Bewertung",
+  "length_detail": "Länge & Detail",
+  "expert_role": "Expertenrolle",
+  "format_clarity": "Format-Klarheit",
+  "specificity": "Spezifität",
+  "ways_to_improve": "Wege zur Verbesserung deines Prompts",
+  "excellent_prompt": "Exzellenter Prompt",
+  "excellent_prompt_desc": "Dies sollte hochwertige, zielgerichtete Antworten von jedem KI-Assistenten generieren."
 }

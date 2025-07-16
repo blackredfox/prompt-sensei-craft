@@ -168,5 +168,16 @@
   "open_in_perplexity": "在Perplexity中打开",
   "open_in_you": "在You.com中打开",
   "prompt_copied": "提示已复制！",
-  "ready_paste_claude": "准备粘贴到Claude.ai"
+  "ready_paste_claude": "准备粘贴到Claude.ai",
+  "adaptive_feedback_manager_professional": "💼 你更愿意保持专业一些吗？这通常更适合管理层沟通。",
+  "adaptive_feedback_client_expert": "📋 考虑使用'专家'语调进行客户工作——这能建立信心和信任。",
+  "prompt_quality_score": "提示质量评分",
+  "score": "评分",
+  "length_detail": "长度和详细度",
+  "expert_role": "专家角色",
+  "format_clarity": "格式清晰度",
+  "specificity": "具体性",
+  "ways_to_improve": "改善你的提示的方法",
+  "excellent_prompt": "优秀的提示",
+  "excellent_prompt_desc": "这应该能从任何AI助手那里产生高质量、有针对性的回答。"
 }

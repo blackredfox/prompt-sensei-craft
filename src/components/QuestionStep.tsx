@@ -47,13 +47,13 @@ export function QuestionStep({
     if (question.id === "tone" && allAnswers.audience === "manager" && answer === "friendly") {
       return {
         type: "suggestion",
-        message: "💼 Would you prefer to keep it more professional? That's often better for manager-level communication."
+        message: t("adaptive_feedback_manager_professional")
       };
     }
     if (question.id === "tone" && allAnswers.audience === "client" && answer === "short") {
       return {
         type: "suggestion", 
-        message: "📋 Consider 'Expert' tone for client work - it builds confidence and trust."
+        message: t("adaptive_feedback_client_expert")
       };
     }
     return null;

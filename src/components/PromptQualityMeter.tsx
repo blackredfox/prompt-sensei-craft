@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Gauge, Target, Lightbulb, AlertCircle } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 interface PromptQualityMeterProps {
   prompt: string;
@@ -12,6 +13,7 @@ interface PromptQualityMeterProps {
     complexity: string;
     depth?: string;
     polishInput?: string;
+    language?: string;
   };
 }
 
@@ -38,6 +40,17 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
     specificity: 0,
     structure: 0
   };
+  
+  // Detect if this is a non-English prompt and adjust scoring accordingly
+  const isNonEnglishPrompt = () => {
+    const language = answers.language;
+    if (language && language !== 'english' && language !== 'auto') return true;
+    
+    // Also check for non-Latin scripts
+    return /[а-яё\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\u0600-\u06ff\u0590-\u05ff]/i.test(prompt);
+  };
+  
+  const isNonEnglish = isNonEnglishPrompt();
 
   // 1. Length scoring (0-2 points)
   if (prompt.length > 50) {
@@ -51,25 +64,83 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
     suggestions.push("Try being more specific about your goal or requirements");
   }
 
-  // 2. Persona/Role presence (0-2 points)
-  if (prompt.includes("Act as") || prompt.includes("You are") || prompt.includes("expert") || prompt.includes("assistant")) {
+  // 2. Persona/Role presence (0-2 points) - Language-aware
+  const personaPatterns = isNonEnglish ? [
+    // Russian
+    /действуй как|ты.*эксперт|ты.*специалист|помощник/i,
+    // Spanish
+    /actúa como|eres.*experto|eres.*especialista|asistente/i,
+    // French
+    /agis comme|tu es.*expert|tu es.*spécialiste|assistant/i,
+    // German
+    /handele als|du bist.*experte|du bist.*spezialist|assistent/i,
+    // Chinese
+    /扮演|你是.*专家|你是.*助手/i,
+    // Arabic
+    /تصرف كما|أنت.*خبير|أنت.*مساعد/i,
+    // Japanese
+    /として行動|あなたは.*専門家|あなたは.*アシスタント/i,
+    // Hebrew
+    /פעל כמו|אתה.*מומחה|אתה.*עוזר/i
+  ] : [/Act as|You are.*expert|You are.*assistant|expert|assistant/i];
+  
+  const hasPersona = personaPatterns.some(pattern => pattern.test(prompt));
+  if (hasPersona) {
     breakdown.persona = 2;
     score += 2;
   } else if (answers.complexity === "optimize") {
     suggestions.push("Enable 'Make it smarter' for automatic expert role detection");
   }
 
-  // 3. Format specification (0-2 points)
-  if (prompt.includes("bullet") || prompt.includes("step") || prompt.includes("list") || prompt.includes("paragraph")) {
+  // 3. Format specification (0-2 points) - Language-aware
+  const formatPatterns = isNonEnglish ? [
+    // Russian
+    /список|пункт|шаг|абзац|маркированный/i,
+    // Spanish
+    /lista|punto|paso|párrafo|viñeta/i,
+    // French
+    /liste|point|étape|paragraphe|puce/i,
+    // German
+    /liste|punkt|schritt|absatz|aufzählung/i,
+    // Chinese
+    /列表|要点|步骤|段落|项目/i,
+    // Arabic
+    /قائمة|نقطة|خطوة|فقرة/i,
+    // Japanese
+    /リスト|箇条書き|ステップ|段落/i,
+    // Hebrew
+    /רשימה|נקודה|שלב|פסקה/i
+  ] : [/bullet|step|list|paragraph/i];
+  
+  const hasFormat = formatPatterns.some(pattern => pattern.test(prompt));
+  if (hasFormat) {
     breakdown.format = 2;
     score += 2;
   } else {
     suggestions.push("Add format specification like bullet points or step-by-step");
   }
 
-  // 4. Specificity (0-2 points)
-  const specificityWords = ["specific", "detailed", "examples", "include", "please provide", "explain how", "show me"];
-  const hasSpecificity = specificityWords.some(word => prompt.toLowerCase().includes(word.toLowerCase()));
+  // 4. Specificity (0-2 points) - Language-aware
+  const specificityPatterns = isNonEnglish ? [
+    // Russian
+    /конкретн|подробн|пример|включи|объясни как|покажи/i,
+    // Spanish
+    /específico|detallado|ejemplo|incluye|explica cómo|muestra/i,
+    // French
+    /spécifique|détaillé|exemple|inclure|expliquer comment|montrer/i,
+    // German
+    /spezifisch|detailliert|beispiel|einschließen|erkläre wie|zeige/i,
+    // Chinese
+    /具体|详细|例子|包括|解释如何|显示/i,
+    // Arabic
+    /محدد|مفصل|مثال|تضمين|اشرح كيف|أظهر/i,
+    // Japanese
+    /具体的|詳細|例|含める|説明して|見せて/i,
+    // Hebrew
+    /ספציפי|מפורט|דוגמה|כלול|הסבר איך|הראה/i
+  ] : [/specific|detailed|examples|include|please provide|explain how|show me/i];
+  
+  const hasSpecificity = specificityPatterns.some(pattern => pattern.test(prompt));
   if (hasSpecificity) {
     breakdown.specificity = 2;
     score += 2;
@@ -77,8 +148,28 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
     suggestions.push("Add specific requests like 'include examples' or 'explain how'");
   }
 
-  // 5. Structure and context (0-2 points)
-  if (prompt.includes("audience") || prompt.includes("client") || prompt.includes("manager") || answers.depth === "deep") {
+  // 5. Structure and context (0-2 points) - Language-aware
+  const contextPatterns = isNonEnglish ? [
+    // Russian
+    /аудитория|клиент|менеджер|руководитель/i,
+    // Spanish
+    /audiencia|cliente|gerente|jefe/i,
+    // French
+    /audience|client|gestionnaire|patron/i,
+    // German
+    /publikum|kunde|manager|chef/i,
+    // Chinese
+    /受众|客户|经理|老板/i,
+    // Arabic
+    /جمهور|عميل|مدير|رئيس/i,
+    // Japanese
+    /オーディエンス|クライアント|マネージャー|上司/i,
+    // Hebrew
+    /קהל|לקוח|מנהל|בוס/i
+  ] : [/audience|client|manager/i];
+  
+  const hasContext = contextPatterns.some(pattern => pattern.test(prompt)) || answers.depth === "deep";
+  if (hasContext) {
     breakdown.structure = 2;
     score += 2;
   } else if (answers.complexity === "simple") {
@@ -103,6 +194,7 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
 }
 
 export function PromptQualityMeter({ prompt, answers }: PromptQualityMeterProps) {
+  const { t } = useTranslation();
   const result = scorePrompt(prompt, answers);
   
   const getColorClass = (tier: string) => {
@@ -138,7 +230,7 @@ export function PromptQualityMeter({ prompt, answers }: PromptQualityMeterProps)
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Gauge className="w-5 h-5 text-primary" />
-            <CardTitle className="text-lg">Prompt Quality Score</CardTitle>
+            <CardTitle className="text-lg">{t('prompt_quality_score')}</CardTitle>
           </div>
           <Badge variant={getBadgeVariant(result.tier)} className="font-medium">
             {result.tier}
@@ -150,7 +242,7 @@ export function PromptQualityMeter({ prompt, answers }: PromptQualityMeterProps)
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Score</span>
+              <span className="text-sm font-medium">{t('score')}</span>
               <span className={`text-2xl font-bold ${getColorClass(result.tier)}`}>
                 {result.score}/10
               </span>
@@ -167,19 +259,19 @@ export function PromptQualityMeter({ prompt, answers }: PromptQualityMeterProps)
         {/* Breakdown */}
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Length & Detail:</span>
+            <span className="text-muted-foreground">{t('length_detail')}:</span>
             <span className="font-medium">{result.breakdown.length}/2</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Expert Role:</span>
+            <span className="text-muted-foreground">{t('expert_role')}:</span>
             <span className="font-medium">{result.breakdown.persona}/2</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Format Clarity:</span>
+            <span className="text-muted-foreground">{t('format_clarity')}:</span>
             <span className="font-medium">{result.breakdown.format}/2</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Specificity:</span>
+            <span className="text-muted-foreground">{t('specificity')}:</span>
             <span className="font-medium">{result.breakdown.specificity}/2</span>
           </div>
         </div>
@@ -191,7 +283,7 @@ export function PromptQualityMeter({ prompt, answers }: PromptQualityMeterProps)
               <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
               <div>
                 <h4 className="text-sm font-medium text-orange-700 dark:text-orange-300 mb-2">
-                  💡 Ways to improve your prompt:
+                  💡 {t('ways_to_improve')}:
                 </h4>
                 <ul className="text-xs text-orange-600 dark:text-orange-400 space-y-1">
                   {result.suggestions.map((suggestion, index) => (
@@ -212,7 +304,7 @@ export function PromptQualityMeter({ prompt, answers }: PromptQualityMeterProps)
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4 text-green-600 dark:text-green-400" />
               <p className="text-sm text-green-700 dark:text-green-300">
-                <strong>Excellent prompt!</strong> This should generate high-quality, targeted responses from any AI assistant.
+                <strong>{t('excellent_prompt')}!</strong> {t('excellent_prompt_desc')}
               </p>
             </div>
           </div>

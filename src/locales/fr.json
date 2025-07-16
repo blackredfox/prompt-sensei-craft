@@ -168,5 +168,16 @@
   "open_in_perplexity": "Ouvrir dans Perplexity",
   "open_in_you": "Ouvrir dans You.com",
   "prompt_copied": "Prompt copié !",
-  "ready_paste_claude": "Prêt à coller dans Claude.ai"
+  "ready_paste_claude": "Prêt à coller dans Claude.ai",
+  "adaptive_feedback_manager_professional": "💼 Préfères-tu le garder plus professionnel ? C'est souvent mieux pour la communication managériale.",
+  "adaptive_feedback_client_expert": "📋 Considère le ton 'Expert' pour le travail client - cela inspire confiance.",
+  "prompt_quality_score": "Score de Qualité du Prompt",
+  "score": "Score",
+  "length_detail": "Longueur & Détail",
+  "expert_role": "Rôle d'Expert",
+  "format_clarity": "Clarté du Format",
+  "specificity": "Spécificité",
+  "ways_to_improve": "Moyens d'améliorer ton prompt",
+  "excellent_prompt": "Excellent prompt",
+  "excellent_prompt_desc": "Ceci devrait générer des réponses de haute qualité et ciblées de tout assistant IA."
 }
