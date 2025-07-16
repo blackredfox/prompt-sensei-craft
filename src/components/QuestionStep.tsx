@@ -66,10 +66,10 @@ export function QuestionStep({
       <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-glow-secondary">
         <CardHeader className="text-center pb-6">
           <CardTitle className="text-2xl md:text-3xl font-bold text-foreground">
-            {question.title}
+            {t(question.title)}
           </CardTitle>
           <p className="text-muted-foreground text-lg">
-            {question.subtitle}
+            {t(question.subtitle)}
           </p>
         </CardHeader>
         
@@ -79,14 +79,14 @@ export function QuestionStep({
               <Textarea
                 value={answer}
                 onChange={(e) => onAnswer(e.target.value)}
-                placeholder={question.placeholder}
+                placeholder={t(question.placeholder)}
                 className="min-h-32 resize-none border-border/50 bg-background/50 focus:border-primary focus:ring-primary text-lg"
               />
               {question.tooltip && (
                 <div className="flex items-start gap-2 mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
                   <HelpCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                   <p className="text-sm text-muted-foreground">
-                    {question.tooltip}
+                    {t(question.tooltip)}
                   </p>
                 </div>
               )}
@@ -110,10 +110,10 @@ export function QuestionStep({
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground mb-1">
-                          {option.label}
+                          {t(option.label)}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          {option.description}
+                          {t(option.description)}
                         </p>
                       </div>
                       {answer === option.value && (
@@ -131,7 +131,7 @@ export function QuestionStep({
                 <div className="flex items-start gap-2 mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
                   <HelpCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                   <p className="text-sm text-muted-foreground">
-                    {question.tooltip}
+                    {t(question.tooltip)}
                   </p>
                 </div>
               )}

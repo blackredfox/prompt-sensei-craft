@@ -84,14 +84,14 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           </Button>
           <div className="flex flex-col items-center gap-2 mt-4">
             <p className="text-sm text-muted-foreground">
-              No signup required • Takes 2 minutes
+              {t('no_signup_required')}
             </p>
             {!user && (
               <p className="text-xs text-muted-foreground">
                 <Link to="/auth" className="text-primary hover:underline">
-                  Sign up for Pro features
+                  {t('sign_up_pro')}
                 </Link>
-                • Save prompts • Access history
+                • {t('save_prompts')}
               </p>
             )}
           </div>
@@ -105,29 +105,29 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               <div className="mx-auto p-3 rounded-xl bg-gradient-primary w-fit mb-4">
                 <Target className="w-8 h-8 text-primary-foreground" />
               </div>
-              <CardTitle className="text-2xl font-bold">Smart Results</CardTitle>
-              <p className="text-muted-foreground">Intelligent optimization for better AI responses</p>
+              <CardTitle className="text-2xl font-bold">{t('smart_results')}</CardTitle>
+              <p className="text-muted-foreground">{t('smart_results_desc')}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
                 <Sparkles className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Smart Optimization</p>
-                  <p className="text-muted-foreground text-xs">Add context and precise instructions</p>
+                  <p className="font-medium text-sm">{t('smart_optimization')}</p>
+                  <p className="text-muted-foreground text-xs">{t('smart_optimization_desc')}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Zap className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Instant Results</p>
-                  <p className="text-muted-foreground text-xs">Get optimized prompts in under 2 minutes</p>
+                  <p className="font-medium text-sm">{t('instant_results')}</p>
+                  <p className="text-muted-foreground text-xs">{t('instant_results_desc')}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Target className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Tailored Output</p>
-                  <p className="text-muted-foreground text-xs">Customize tone, format, and complexity</p>
+                  <p className="font-medium text-sm">{t('tailored_output')}</p>
+                  <p className="text-muted-foreground text-xs">{t('tailored_output_desc')}</p>
                 </div>
               </div>
             </CardContent>
@@ -139,22 +139,22 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               <div className="mx-auto p-3 rounded-xl bg-gradient-secondary w-fit mb-4">
                 <Smile className="w-8 h-8 text-accent-foreground" />
               </div>
-              <CardTitle className="text-2xl font-bold">Personalized for You</CardTitle>
-              <p className="text-muted-foreground">Built for every skill level and use case</p>
+              <CardTitle className="text-2xl font-bold">{t('personalized_for_you')}</CardTitle>
+              <p className="text-muted-foreground">{t('personalized_desc')}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
                 <Smile className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Beginner Friendly</p>
-                  <p className="text-muted-foreground text-xs">No jargon, just step-by-step guidance</p>
+                  <p className="font-medium text-sm">{t('beginner_friendly')}</p>
+                  <p className="text-muted-foreground text-xs">{t('beginner_friendly_desc')}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Code2 className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Code-Ready Prompts</p>
-                  <p className="text-muted-foreground text-xs">Clean, structured code with explanations</p>
+                  <p className="font-medium text-sm">{t('code_ready_prompts')}</p>
+                  <p className="text-muted-foreground text-xs">{t('code_ready_desc')}</p>
                 </div>
               </div>
             </CardContent>
@@ -166,22 +166,22 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               <div className="mx-auto p-3 rounded-xl bg-gradient-accent w-fit mb-4">
                 <SearchCheck className="w-8 h-8 text-accent-foreground" />
               </div>
-              <CardTitle className="text-2xl font-bold">Global & Pro</CardTitle>
-              <p className="text-muted-foreground">Advanced features for power users</p>
+              <CardTitle className="text-2xl font-bold">{t('global_and_pro')}</CardTitle>
+              <p className="text-muted-foreground">{t('global_pro_desc')}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
                 <SearchCheck className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Deep Insight Mode</p>
-                  <p className="text-muted-foreground text-xs">Advanced analysis and synthesis</p>
+                  <p className="font-medium text-sm">{t('deep_insight_mode')}</p>
+                  <p className="text-muted-foreground text-xs">{t('deep_insight_desc')}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Languages className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Multilingual Friendly</p>
-                  <p className="text-muted-foreground text-xs">Create prompts in your native language</p>
+                  <p className="font-medium text-sm">{t('multilingual_friendly')}</p>
+                  <p className="text-muted-foreground text-xs">{t('multilingual_desc')}</p>
                 </div>
               </div>
             </CardContent>
@@ -190,9 +190,9 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
 
         {/* How It Works */}
         <div className="text-center mb-20">
-          <h3 className="text-3xl font-bold mb-4">How It Works</h3>
+          <h3 className="text-3xl font-bold mb-4">{t('how_it_works')}</h3>
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
-            Three simple steps to transform your ideas into powerful AI prompts
+            {t('how_it_works_desc')}
           </p>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -200,9 +200,9 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center mb-6 shadow-glow-primary">
                 <Edit3 className="w-8 h-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold mb-3">1. Enter Your Idea</h4>
+              <h4 className="text-xl font-semibold mb-3">{t('enter_your_idea')}</h4>
               <p className="text-muted-foreground">
-                Start with any question or task you want to give to AI
+                {t('enter_idea_desc')}
               </p>
             </div>
             
@@ -210,9 +210,9 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-secondary flex items-center justify-center mb-6 shadow-glow-secondary">
                 <Settings className="w-8 h-8 text-accent-foreground" />
               </div>
-              <h4 className="text-xl font-semibold mb-3">2. Answer Quick Questions</h4>
+              <h4 className="text-xl font-semibold mb-3">{t('answer_quick_questions')}</h4>
               <p className="text-muted-foreground">
-                We'll guide you through optimizing your prompt step by step
+                {t('answer_questions_desc')}
               </p>
             </div>
             
@@ -220,9 +220,9 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-accent flex items-center justify-center mb-6 shadow-glow-accent">
                 <Rocket className="w-8 h-8 text-accent-foreground" />
               </div>
-              <h4 className="text-xl font-semibold mb-3">3. Get Optimized Prompt</h4>
+              <h4 className="text-xl font-semibold mb-3">{t('get_optimized_prompt')}</h4>
               <p className="text-muted-foreground">
-                Copy your enhanced prompt and get better AI results
+                {t('get_prompt_desc')}
               </p>
             </div>
           </div>
@@ -231,9 +231,9 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
         {/* Final CTA */}
         <div className="text-center">
           <div className="bg-gradient-to-r from-card/50 to-card/30 backdrop-blur-sm border border-border/50 rounded-3xl p-12">
-            <h3 className="text-3xl font-bold mb-4">Ready to master AI prompting?</h3>
+            <h3 className="text-3xl font-bold mb-4">{t('ready_to_master')}</h3>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of users who are already getting better results from their AI conversations
+              {t('join_thousands')}
             </p>
             <Button 
               onClick={onStart}
@@ -241,7 +241,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               className="bg-gradient-primary hover:shadow-glow-primary text-primary-foreground px-10 py-6 text-xl font-semibold transition-all duration-300 hover:scale-105 rounded-2xl"
             >
               <MessageSquare className="w-6 h-6 mr-3" />
-              Start Your Journey
+              {t('start_your_journey')}
             </Button>
           </div>
         </div>

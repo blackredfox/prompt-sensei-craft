@@ -74,110 +74,110 @@ export function polishText(text: string): { polished: string; wasPolished: boole
 const questions = [
   {
     id: "question",
-    title: "What do you want to ask the AI?",
-    subtitle: "Be as specific as possible about what you need help with",
+    title: "what_ask_ai",
+    subtitle: "be_specific",
     type: "textarea" as const,
-    placeholder: "e.g., Help me write a marketing email for my new product launch...",
-    tooltip: "💡 Tip: The more details you provide, the more helpful the AI can be. Instead of 'Write resume', try 'Write resume for a junior frontend developer in fintech.'"
+    placeholder: "placeholder_example",
+    tooltip: "tip_details"
   },
   {
     id: "audience",
-    title: "Who is the answer for?",
-    subtitle: "This helps me tailor the language and detail level",
+    title: "who_answer_for",
+    subtitle: "tailor_language",
     type: "select" as const,
-    tooltip: "Clients prefer polished and persuasive language, while personal use can be more casual. Choose Code Generation if you're using AI to write, refactor, or explain code — includes technical guidance and structured output",
+    tooltip: "audience_tooltip",
     options: [
-      { value: "myself", label: "Myself", description: "Personal use or learning" },
-      { value: "client", label: "My client", description: "Professional deliverable" },
-      { value: "manager", label: "My manager", description: "Work presentation or report" },
-      { value: "code", label: "Code Generation", description: "Writing prompts for AI to generate or explain code" },
-      { value: "other", label: "Other", description: "General audience" }
+      { value: "myself", label: "myself", description: "myself_desc" },
+      { value: "client", label: "my_client", description: "client_desc" },
+      { value: "manager", label: "my_manager", description: "manager_desc" },
+      { value: "code", label: "code_generation", description: "code_desc" },
+      { value: "other", label: "other", description: "other_desc" }
     ]
   },
   {
     id: "tone",
-    title: "What tone or style do you prefer?",
-    subtitle: "Tone controls how formal, casual or emotional the response sounds",
+    title: "tone_style",
+    subtitle: "tone_controls",
     type: "select" as const,
-    tooltip: "Friendly = casual and warm. Expert = formal and authoritative. Short = concise and direct. Creative = imaginative and engaging",
+    tooltip: "tone_tooltip",
     options: [
-      { value: "friendly", label: "Friendly", description: "Conversational and approachable" },
-      { value: "expert", label: "Expert", description: "Professional and authoritative" },
-      { value: "short", label: "Short", description: "Concise and to the point" },
-      { value: "creative", label: "Creative", description: "Imaginative and engaging" }
+      { value: "friendly", label: "friendly", description: "friendly_desc" },
+      { value: "expert", label: "expert", description: "expert_desc" },
+      { value: "short", label: "short", description: "short_desc" },
+      { value: "creative", label: "creative", description: "creative_desc" }
     ]
   },
   {
     id: "format",
-    title: "What format would be best?",
-    subtitle: "How would you like the information structured?",
+    title: "format_best",
+    subtitle: "format_structured",
     type: "select" as const,
-    tooltip: "Bullet = overview and key points. Steps = process and tutorials. Paragraph = essay-style detailed explanations",
+    tooltip: "format_tooltip",
     options: [
-      { value: "bullet", label: "Bullet list", description: "Great for summaries or key points" },
-      { value: "steps", label: "Step-by-step", description: "Perfect for tutorials or walkthroughs" },
-      { value: "paragraph", label: "Paragraph", description: "Detailed explanation" }
+      { value: "bullet", label: "bullet_list", description: "bullet_desc" },
+      { value: "steps", label: "step_by_step", description: "steps_desc" },
+      { value: "paragraph", label: "paragraph", description: "paragraph_desc" }
     ]
   },
   {
     id: "complexity",
-    title: "How smart should I make this prompt?",
-    subtitle: "Choose based on your AI experience level",
+    title: "how_smart_prompt",
+    subtitle: "ai_experience_level",
     type: "select" as const,
-    tooltip: "Optimize adds structure, examples, and expert tone for better results. Keep it simple for straightforward responses",
+    tooltip: "complexity_tooltip",
     options: [
-      { value: "optimize", label: "Make it smarter", description: "Add context, examples, and detailed instructions" },
-      { value: "simple", label: "I'm new — keep it clear", description: "Direct and straightforward approach" }
+      { value: "optimize", label: "make_smarter", description: "make_smarter_desc" },
+      { value: "simple", label: "keep_clear", description: "keep_clear_desc" }
     ]
   },
   {
     id: "depth",
-    title: "Would you like the AI to go deeper?",
-    subtitle: "Choose how thorough you want the AI's analysis to be",
+    title: "ai_go_deeper",
+    subtitle: "thorough_analysis",
     type: "select" as const,
-    tooltip: "DeepSearch enables analytical thinking, comparisons, and research-based insights",
+    tooltip: "deep_search_tooltip",
     options: [
-      { value: "deep", label: "🔎 DeepSearch", description: "Let the AI explore sources, trends, comparisons, and give a smart, thoughtful response" },
-      { value: "simple", label: "🎯 Keep it Simple", description: "Just answer my question clearly" }
+      { value: "deep", label: "deep_search", description: "deep_search_desc" },
+      { value: "simple", label: "keep_simple", description: "keep_simple_desc" }
     ]
   },
   {
     id: "polishInput",
-    title: "Polish my input automatically?",
-    subtitle: "Help improve grammar and clarity of your question",
+    title: "polish_input_auto",
+    subtitle: "improve_grammar",
     type: "select" as const,
-    tooltip: "We'll gently fix common grammar mistakes and improve clarity while preserving your meaning",
+    tooltip: "polish_tooltip",
     options: [
-      { value: "true", label: "✨ Polish it", description: "Fix grammar and improve clarity automatically" },
-      { value: "false", label: "💭 Keep as-is", description: "Use my exact wording" }
+      { value: "true", label: "polish_it", description: "polish_desc" },
+      { value: "false", label: "keep_as_is", description: "keep_as_is_desc" }
     ]
   },
   {
     id: "insightMode",
-    title: "Would you like deeper reasoning in your answer?",
-    subtitle: "Choose how analytical you want the AI's response to be",
+    title: "deeper_reasoning",
+    subtitle: "analytical_response",
     type: "select" as const,
-    tooltip: "Deep Insight helps you get better analytical responses — ideal for complex topics, strategy, or research",
+    tooltip: "insight_tooltip",
     options: [
-      { value: "deep", label: "🔍 Deep Insight", description: "Ask the AI to analyze deeply, compare views, and provide real examples" },
-      { value: "simple", label: "💬 Just Answer", description: "Keep it clear and to the point" }
+      { value: "deep", label: "deep_insight", description: "deep_insight_desc" },
+      { value: "simple", label: "just_answer", description: "just_answer_desc" }
     ]
   },
   {
     id: "language",
-    title: "What language should the AI respond in?",
-    subtitle: "Choose your preferred response language",
+    title: "language_respond",
+    subtitle: "preferred_response_lang",
     type: "select" as const,
-    tooltip: "You can write your input in any language. The AI will be instructed to respond in your selected language with proper cultural context and native-like fluency.",
+    tooltip: "language_tooltip",
     options: [
-      { value: "english", label: "🇺🇸 English", description: "Respond in English" },
-      { value: "spanish", label: "🇪🇸 Spanish", description: "Respond in Spanish" },
-      { value: "french", label: "🇫🇷 French", description: "Respond in French" },
-      { value: "german", label: "🇩🇪 German", description: "Respond in German" },
-      { value: "russian", label: "🇷🇺 Russian", description: "Respond in Russian" },
-      { value: "chinese", label: "🇨🇳 Chinese", description: "Respond in Chinese" },
-      { value: "japanese", label: "🇯🇵 Japanese", description: "Respond in Japanese" },
-      { value: "auto", label: "🌐 Auto-detect", description: "Detect language from question" }
+      { value: "english", label: "english", description: "english_desc" },
+      { value: "spanish", label: "spanish", description: "spanish_desc" },
+      { value: "french", label: "french", description: "french_desc" },
+      { value: "german", label: "german", description: "german_desc" },
+      { value: "russian", label: "russian", description: "russian_desc" },
+      { value: "chinese", label: "chinese", description: "chinese_desc" },
+      { value: "japanese", label: "japanese", description: "japanese_desc" },
+      { value: "auto", label: "auto_detect", description: "auto_detect_desc" }
     ]
   }
 ];
