@@ -1,12 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, Sparkles, Zap, Target, MessageSquare, Smile, Code2, SearchCheck, Languages, Edit3, Settings, Rocket } from "lucide-react";
+import { useAuth } from "./AuthContext";
+import { Brain, Sparkles, Zap, Target, MessageSquare, Smile, Code2, SearchCheck, Languages, Edit3, Settings, Rocket, LogIn, LogOut, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface WelcomeScreenProps {
   onStart: () => void;
 }
 
 export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
+  const { user, signOut } = useAuth();
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Background gradient */}
@@ -16,6 +20,34 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
       <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-primary rounded-full blur-3xl opacity-20 animate-pulse" />
       <div className="absolute top-40 right-20 w-48 h-48 bg-gradient-secondary rounded-full blur-3xl opacity-15 animate-pulse" style={{ animationDelay: '1s' }} />
       <div className="absolute bottom-20 left-1/3 w-24 h-24 bg-gradient-accent rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '2s' }} />
+
+      {/* Auth Navigation */}
+      <div className="absolute top-4 right-4 z-50">
+        {user ? (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="w-4 h-4" />
+              <span>{user.email}</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={signOut}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        ) : (
+          <Button variant="outline" asChild>
+            <Link to="/auth">
+              <LogIn className="w-4 h-4 mr-2" />
+              Sign In
+            </Link>
+          </Button>
+        )}
+      </div>
 
       <div className="relative container max-w-6xl mx-auto px-4 py-12">
         {/* Hero Section */}
@@ -44,9 +76,19 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             <MessageSquare className="w-6 h-6 mr-3" />
             Start Crafting Your Prompt
           </Button>
-          <p className="text-sm text-muted-foreground mt-4">
-            No signup required • Takes 2 minutes
-          </p>
+          <div className="flex flex-col items-center gap-2 mt-4">
+            <p className="text-sm text-muted-foreground">
+              No signup required • Takes 2 minutes
+            </p>
+            {!user && (
+              <p className="text-xs text-muted-foreground">
+                <Link to="/auth" className="text-primary hover:underline">
+                  Sign up for Pro features
+                </Link>
+                • Save prompts • Access history
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Feature Clusters */}

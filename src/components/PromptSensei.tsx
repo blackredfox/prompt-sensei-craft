@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "./AuthContext";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { QuestionStep } from "./QuestionStep";
 import { ResultScreen } from "./ResultScreen";
-import { Brain, Sparkles } from "lucide-react";
+import { Brain, Sparkles, LogOut, User } from "lucide-react";
 
 export interface PromptAnswers {
   question: string;
@@ -182,6 +183,7 @@ const questions = [
 export function PromptSensei() {
   const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1-6 = questions, 7 = result
   const [answers, setAnswers] = useState<Partial<PromptAnswers>>({});
+  const { user, signOut, loading } = useAuth();
 
   const handleStart = () => {
     setCurrentStep(1);
@@ -236,14 +238,34 @@ export function PromptSensei() {
       <div className="container max-w-3xl mx-auto px-4 py-8 pt-16">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="p-2 rounded-lg bg-gradient-primary">
-              <Brain className="w-5 h-5 text-primary-foreground" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-gradient-primary">
+                <Brain className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                PromptSensei
+              </span>
             </div>
-            <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              PromptSensei
-            </span>
+            
+            {user && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  <span>{user.email}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={signOut}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
           </div>
+          
           <Badge variant="secondary" className="mb-4">
             Step {currentStep} of {questions.length}
           </Badge>
