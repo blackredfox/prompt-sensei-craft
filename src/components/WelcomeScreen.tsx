@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "./AuthContext";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Brain, Sparkles, Zap, Target, MessageSquare, Smile, Code2, SearchCheck, Languages, Edit3, Settings, Rocket, LogIn, LogOut, User } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 interface WelcomeScreenProps {
   onStart: () => void;
@@ -10,6 +12,7 @@ interface WelcomeScreenProps {
 
 export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   const { user, signOut } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -23,30 +26,33 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
 
       {/* Auth Navigation */}
       <div className="absolute top-4 right-4 z-50">
-        {user ? (
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <User className="w-4 h-4" />
-              <span>{user.email}</span>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          {user ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="w-4 h-4" />
+                <span>{user.email}</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={signOut}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                {t('logout')}
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={signOut}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
+          ) : (
+            <Button variant="outline" asChild>
+              <Link to="/auth">
+                <LogIn className="w-4 h-4 mr-2" />
+                {t('login')}
+              </Link>
             </Button>
-          </div>
-        ) : (
-          <Button variant="outline" asChild>
-            <Link to="/auth">
-              <LogIn className="w-4 h-4 mr-2" />
-              Sign In
-            </Link>
-          </Button>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="relative container max-w-6xl mx-auto px-4 py-12">
@@ -62,10 +68,10 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           </div>
           
           <h2 className="text-2xl md:text-3xl text-foreground mb-6 font-semibold">
-            Master the art of AI prompting
+            {t('welcome')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-10">
-            Transform your ideas into powerful AI prompts in minutes. Get better results from ChatGPT, Claude, and Gemini with our guided optimization process.
+            {t('subtitle')}
           </p>
 
           <Button 
@@ -74,7 +80,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             className="bg-gradient-primary hover:shadow-glow-primary text-primary-foreground px-10 py-6 text-xl font-semibold transition-all duration-300 hover:scale-105 rounded-2xl"
           >
             <MessageSquare className="w-6 h-6 mr-3" />
-            Start Crafting Your Prompt
+            {t('get_started')}
           </Button>
           <div className="flex flex-col items-center gap-2 mt-4">
             <p className="text-sm text-muted-foreground">

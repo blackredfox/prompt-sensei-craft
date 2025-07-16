@@ -9,6 +9,7 @@ import { Copy, CheckCheck, RotateCcw, Lightbulb, Sparkles, ExternalLink, Info, W
 import { useToast } from "@/hooks/use-toast";
 import { OpenInButtons } from "./OpenInButtons";
 import { askOpenAI } from "@/services/prompt-service";
+import { useTranslation } from 'react-i18next';
 
 interface ResultScreenProps {
   answers: PromptAnswers;
@@ -239,6 +240,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { savePrompt } = usePromptLibrary();
+  const { t } = useTranslation();
   
   const { prompt, explanation, polishInfo } = generateOptimizedPrompt(answers);
 
@@ -247,14 +249,14 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
       await navigator.clipboard.writeText(prompt);
       setCopied(true);
       toast({
-        title: "Copied to clipboard!",
-        description: "Your optimized prompt is ready to use.",
+        title: t('copy_success'),
+        description: t('copy_success_desc'),
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast({
-        title: "Copy failed",
-        description: "Please select and copy the text manually.",
+        title: t('copy_failed'),
+        description: t('copy_failed_desc'),
         variant: "destructive",
       });
     }
@@ -290,14 +292,14 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
       setAiResponse(response);
       
       toast({
-        title: "AI response generated!",
-        description: "Your prompt worked successfully.",
+        title: t('ai_response_generated'),
+        description: t('ai_response_success'),
       });
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
       toast({
-        title: "Error",
-        description: "Failed to get AI response. Please try again.",
+        title: t('error'),
+        description: t('error_ai_failed'),
         variant: "destructive",
       });
     } finally {
@@ -315,11 +317,11 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Your Optimized Prompt
+              {t('your_optimized_prompt')}
             </span>
           </div>
           <Badge variant="secondary" className="mb-4">
-            Ready to use with ChatGPT, Claude, or Gemini
+            {t('ready_to_use')}
           </Badge>
         </div>
 
@@ -332,14 +334,14 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
                   <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                   <div className="space-y-2">
                     <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                      ✨ We polished your question slightly to help the AI understand better:
+                      {t('polish_notice')}
                     </p>
                     <div className="text-xs space-y-1">
                       <div className="text-muted-foreground">
-                        <span className="font-mono bg-background/50 px-2 py-1 rounded border">Original:</span> {polishInfo.original}
+                        <span className="font-mono bg-background/50 px-2 py-1 rounded border">{t('original')}</span> {polishInfo.original}
                       </div>
                       <div className="text-foreground">
-                        <span className="font-mono bg-primary/10 px-2 py-1 rounded border">Improved:</span> {polishInfo.polished}
+                        <span className="font-mono bg-primary/10 px-2 py-1 rounded border">{t('improved')}</span> {polishInfo.polished}
                       </div>
                     </div>
                   </div>
@@ -352,7 +354,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
           <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-glow-secondary">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-semibold">Your Optimized Prompt</CardTitle>
+                <CardTitle className="text-xl font-semibold">{t('your_optimized_prompt')}</CardTitle>
                 <Button
                   onClick={handleCopy}
                   variant="outline"
@@ -362,12 +364,12 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
                   {copied ? (
                     <>
                       <CheckCheck className="w-4 h-4 mr-2" />
-                      Copied!
+                      {t('copied')}
                     </>
                   ) : (
                     <>
                       <Copy className="w-4 h-4 mr-2" />
-                      Copy
+                      {t('copy')}
                     </>
                   )}
                 </Button>
@@ -391,7 +393,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Wand2 className="w-5 h-5 text-primary" />
-                  <CardTitle className="text-lg">Test Your Prompt</CardTitle>
+                  <CardTitle className="text-lg">{t('test_your_prompt')}</CardTitle>
                 </div>
                 <Button
                   onClick={handleTestWithAI}
@@ -403,12 +405,12 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Thinking...
+                      {t('thinking')}
                     </>
                   ) : (
                     <>
                       <Wand2 className="w-4 h-4 mr-2" />
-                      Test with AI
+                      {t('test_with_ai')}
                     </>
                   )}
                 </Button>
@@ -423,7 +425,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
               
               {aiResponse && (
                 <div className="p-4 rounded-lg bg-background/50 border border-border/50">
-                  <p className="text-sm text-muted-foreground mb-2">AI Response:</p>
+                  <p className="text-sm text-muted-foreground mb-2">{t('ai_response')}</p>
                   <div className="text-foreground leading-relaxed whitespace-pre-wrap">
                     {aiResponse}
                   </div>
@@ -432,7 +434,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
               
               {!aiResponse && !loading && (
                 <p className="text-muted-foreground text-sm">
-                  Click "Test with AI" to see how your optimized prompt performs with our AI model.
+                  {t('click_test_ai')}
                 </p>
               )}
             </CardContent>
@@ -450,7 +452,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Lightbulb className="w-5 h-5 text-primary" />
-                <CardTitle className="text-lg">Here's why this prompt hits the mark</CardTitle>
+                <CardTitle className="text-lg">{t('why_prompt_works')}</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
@@ -469,7 +471,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
               className="border-border/50 hover:border-primary/50"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
-              Create Another Prompt
+              {t('restart')}
             </Button>
             <Button
               onClick={handleCopy}
@@ -480,12 +482,12 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
               {copied ? (
                 <>
                   <CheckCheck className="w-4 h-4 mr-2" />
-                  Copied!
+                  {t('copied')}
                 </>
               ) : (
                 <>
                   <Copy className="w-4 h-4 mr-2" />
-                  Copy Prompt
+                  {t('copy_prompt')}
                 </>
               )}
             </Button>

@@ -4,10 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "./AuthContext";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { QuestionStep } from "./QuestionStep";
 import { ResultScreen } from "./ResultScreen";
 import { Brain, Sparkles, LogOut, User } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 export interface PromptAnswers {
   question: string;
@@ -184,6 +186,7 @@ export function PromptSensei() {
   const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1-6 = questions, 7 = result
   const [answers, setAnswers] = useState<Partial<PromptAnswers>>({});
   const { user, signOut, loading } = useAuth();
+  const { t } = useTranslation();
 
   const handleStart = () => {
     setCurrentStep(1);
@@ -248,26 +251,29 @@ export function PromptSensei() {
               </span>
             </div>
             
-            {user && (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <User className="w-4 h-4" />
-                  <span>{user.email}</span>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              {user && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <User className="w-4 h-4" />
+                    <span>{user.email}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={signOut}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={signOut}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <LogOut className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
           
           <Badge variant="secondary" className="mb-4">
-            Step {currentStep} of {questions.length}
+            {t('step_of', { current: currentStep, total: questions.length })}
           </Badge>
         </div>
 
