@@ -31,40 +31,102 @@ export function polishText(text: string): { polished: string; wasPolished: boole
   let polished = original;
   let hasChanges = false;
   
-  // Common fixes - array of [pattern, replacement] pairs
-  const fixes: [RegExp, string][] = [
-    [/\s+/g, ' '], // Multiple spaces to single space
-    [/\bi\b/g, 'I'], // Lowercase 'i' to 'I'
-    [/\bim\b/gi, "I'm"], // 'im' to "I'm"
-    [/\bdont\b/gi, "don't"], // 'dont' to "don't"
-    [/\bcant\b/gi, "can't"], // 'cant' to "can't"
-    [/\bwont\b/gi, "won't"], // 'wont' to "won't"
-    [/\bisnt\b/gi, "isn't"], // 'isnt' to "isn't"
-    [/\barent\b/gi, "aren't"], // 'arent' to "aren't"
-    [/\bsaj\b/gi, "say"], // Common typo
-    [/\bto do not\b/gi, "not to"], // Grammar fix
-    [/\bwow can i\b/gi, "How can I"], // Common start
-  ];
+  // Detect if text is likely non-English using common patterns
+  const isLikelyNonEnglish = (text: string): boolean => {
+    // Russian patterns
+    if (/[а-яё]/i.test(text)) return true;
+    // Chinese/Japanese patterns  
+    if (/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff]/i.test(text)) return true;
+    // Arabic patterns
+    if (/[\u0600-\u06ff]/i.test(text)) return true;
+    // Spanish/French patterns (accented characters)
+    if (/[àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ]/i.test(text)) return true;
+    // German patterns
+    if (/[äöüß]/i.test(text)) return true;
+    return false;
+  };
   
-  fixes.forEach(([pattern, replacement]) => {
-    const newText = polished.replace(pattern, replacement);
+  if (isLikelyNonEnglish(polished)) {
+    // For non-English text, just do basic cleanup
+    // Multiple spaces to single space
+    const newText = polished.replace(/\s+/g, ' ');
     if (newText !== polished) {
       hasChanges = true;
       polished = newText;
     }
-  });
-  
-  // Capitalize first letter
-  if (polished && polished[0] !== polished[0].toUpperCase()) {
-    polished = polished[0].toUpperCase() + polished.slice(1);
-    hasChanges = true;
+    
+    // Capitalize first letter if it's a letter
+    if (polished && /[a-zA-Zа-яёА-ЯЁ]/.test(polished[0]) && polished[0] !== polished[0].toUpperCase()) {
+      polished = polished[0].toUpperCase() + polished.slice(1);
+      hasChanges = true;
+    }
+    
+    // Russian-specific fixes
+    if (/[а-яё]/i.test(polished)) {
+      const russianFixes: [RegExp, string][] = [
+        [/\bсколко\b/gi, "сколько"], // Common typo: "сколко" → "сколько"
+        [/\bзвесзд\b/gi, "звёзд"], // Common typo: "звесзд" → "звёзд"
+        [/\bчтобы\b/gi, "чтобы"], // Ensure correct form
+        [/\bтакже\b/gi, "также"], // Ensure correct form
+      ];
+      
+      russianFixes.forEach(([pattern, replacement]) => {
+        const newText = polished.replace(pattern, replacement);
+        if (newText !== polished) {
+          hasChanges = true;
+          polished = newText;
+        }
+      });
+    }
+  } else {
+    // English grammar fixes
+    const fixes: [RegExp, string][] = [
+      [/\s+/g, ' '], // Multiple spaces to single space
+      [/\bi\b/g, 'I'], // Lowercase 'i' to 'I'
+      [/\bim\b/gi, "I'm"], // 'im' to "I'm"
+      [/\bdont\b/gi, "don't"], // 'dont' to "don't"
+      [/\bcant\b/gi, "can't"], // 'cant' to "can't"
+      [/\bwont\b/gi, "won't"], // 'wont' to "won't"
+      [/\bisnt\b/gi, "isn't"], // 'isnt' to "isn't"
+      [/\barent\b/gi, "aren't"], // 'arent' to "aren't"
+      [/\bsaj\b/gi, "say"], // Common typo
+      [/\bto do not\b/gi, "not to"], // Grammar fix
+      [/\bwow can i\b/gi, "How can I"], // Common start
+    ];
+    
+    fixes.forEach(([pattern, replacement]) => {
+      const newText = polished.replace(pattern, replacement);
+      if (newText !== polished) {
+        hasChanges = true;
+        polished = newText;
+      }
+    });
+    
+    // Capitalize first letter
+    if (polished && polished[0] !== polished[0].toUpperCase()) {
+      polished = polished[0].toUpperCase() + polished.slice(1);
+      hasChanges = true;
+    }
   }
   
-  // Ensure proper sentence ending
+  // Ensure proper sentence ending for all languages
   if (polished && !/[.!?]$/.test(polished)) {
-    polished += polished.includes('?') || polished.toLowerCase().startsWith('how') || 
-               polished.toLowerCase().startsWith('what') || polished.toLowerCase().startsWith('why') ||
-               polished.toLowerCase().startsWith('when') || polished.toLowerCase().startsWith('where') ? '?' : '.';
+    // Check for question words in multiple languages
+    const questionPatterns = [
+      // English
+      /^(how|what|why|when|where|who|which|can|could|would|should|do|does|did|is|are|was|were)/i,
+      // Russian  
+      /^(как|что|почему|когда|где|кто|какой|можно|могу|должен|является)/i,
+      // Spanish
+      /^(cómo|qué|por qué|cuándo|dónde|quién|cuál|puedo|podría|debería)/i,
+      // French
+      /^(comment|que|pourquoi|quand|où|qui|quel|puis-je|pourrais|devrais)/i,
+      // German
+      /^(wie|was|warum|wann|wo|wer|welche|kann|könnte|sollte)/i
+    ];
+    
+    const isQuestion = questionPatterns.some(pattern => pattern.test(polished)) || polished.includes('?');
+    polished += isQuestion ? '?' : '.';
     hasChanges = true;
   }
   
