@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ExternalLink, Copy, MessageSquare, Search, Globe, Brain } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 interface OpenInButtonsProps {
   prompt: string;
@@ -8,6 +9,7 @@ interface OpenInButtonsProps {
 
 export function OpenInButtons({ prompt }: OpenInButtonsProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const openIn = (platform: string) => {
     const encoded = encodeURIComponent(prompt);
@@ -27,13 +29,13 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
     try {
       await navigator.clipboard.writeText(prompt);
       toast({
-        title: "Prompt copied!",
-        description: "Ready to paste into Claude.ai",
+        title: t('prompt_copied'),
+        description: t('ready_paste_claude'),
       });
     } catch (err) {
       toast({
-        title: "Copy failed",
-        description: "Please copy the prompt manually",
+        title: t('copy_failed'),
+        description: t('copy_failed_desc'),
         variant: "destructive",
       });
     }
@@ -42,9 +44,9 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
   return (
     <div className="space-y-4">
       <div className="text-center">
-        <h3 className="text-lg font-semibold mb-2">Open in your favorite AI</h3>
+        <h3 className="text-lg font-semibold mb-2">{t('open_in_favorite_ai')}</h3>
         <p className="text-sm text-muted-foreground">
-          Send your optimized prompt directly to popular AI platforms
+          {t('send_optimized_prompt')}
         </p>
       </div>
       
@@ -54,7 +56,7 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
           className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
         >
           <MessageSquare className="w-4 h-4 mr-2" />
-          Open in ChatGPT
+          {t('open_in_chatgpt')}
         </Button>
         
         <Button
@@ -62,7 +64,7 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
           className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
         >
           <Brain className="w-4 h-4 mr-2" />
-          Open in Gemini
+          {t('open_in_gemini')}
         </Button>
         
         <Button
@@ -70,7 +72,7 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
           className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
         >
           <Copy className="w-4 h-4 mr-2" />
-          Copy for Claude
+          {t('copy_for_claude')}
         </Button>
         
         <Button
@@ -78,7 +80,7 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
           className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
         >
           <Search className="w-4 h-4 mr-2" />
-          Open in Perplexity
+          {t('open_in_perplexity')}
         </Button>
         
         <Button
@@ -86,7 +88,7 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
           className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
         >
           <Globe className="w-4 h-4 mr-2" />
-          Open in You.com
+          {t('open_in_you')}
         </Button>
       </div>
     </div>

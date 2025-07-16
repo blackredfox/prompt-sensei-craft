@@ -157,5 +157,16 @@
   "japanese": "🇯🇵 日语",
   "japanese_desc": "用日语响应",
   "auto_detect": "🌐 自动检测",
-  "auto_detect_desc": "从问题中检测语言"
+  "auto_detect_desc": "从问题中检测语言",
+  "hebrew": "🇮🇱 希伯来语",
+  "hebrew_desc": "用希伯来语回应",
+  "open_in_favorite_ai": "在你喜欢的AI中打开",
+  "send_optimized_prompt": "将您优化的提示直接发送到热门AI平台",
+  "open_in_chatgpt": "在ChatGPT中打开",
+  "open_in_gemini": "在Gemini中打开",
+  "copy_for_claude": "为Claude复制",
+  "open_in_perplexity": "在Perplexity中打开",
+  "open_in_you": "在You.com中打开",
+  "prompt_copied": "提示已复制！",
+  "ready_paste_claude": "准备粘贴到Claude.ai"
 }

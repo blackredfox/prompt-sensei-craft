@@ -9,6 +9,7 @@ import fr from './locales/fr.json';
 import zh from './locales/zh.json';
 import ar from './locales/ar.json';
 import ja from './locales/ja.json';
+import he from './locales/he.json';
 
 i18n
   .use(initReactI18next)
@@ -21,7 +22,8 @@ i18n
       fr: { translation: fr },
       zh: { translation: zh },
       ar: { translation: ar },
-      ja: { translation: ja }
+      ja: { translation: ja },
+      he: { translation: he }
     },
     lng: 'en', // default language
     fallbackLng: 'en',

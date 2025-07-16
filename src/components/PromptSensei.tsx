@@ -35,16 +35,18 @@ export function polishText(text: string): { polished: string; wasPolished: boole
   const isLikelyNonEnglish = (text: string): boolean => {
     // Russian patterns
     if (/[а-яё]/i.test(text)) return true;
-    // Chinese/Japanese patterns  
-    if (/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff]/i.test(text)) return true;
+    // Chinese patterns  
+    if (/[\u4e00-\u9fff]/i.test(text)) return true;
+    // Japanese patterns (Hiragana, Katakana)
+    if (/[\u3040-\u309f\u30a0-\u30ff]/i.test(text)) return true;
     // Arabic patterns
     if (/[\u0600-\u06ff]/i.test(text)) return true;
+    // Hebrew patterns
+    if (/[\u0590-\u05ff]/i.test(text)) return true;
     // Spanish/French patterns (accented characters)
     if (/[àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ]/i.test(text)) return true;
     // German patterns
     if (/[äöüß]/i.test(text)) return true;
-    // Japanese patterns (Hiragana, Katakana)
-    if (/[\u3040-\u309f\u30a0-\u30ff]/i.test(text)) return true;
     return false;
   };
   
@@ -127,15 +129,52 @@ export function polishText(text: string): { polished: string; wasPolished: boole
           polished = newText;
         }
       });
+    } else if (/[\u0590-\u05ff]/i.test(polished)) {
+      // Hebrew-specific fixes
+      const hebrewFixes: [RegExp, string][] = [
+        [/\s+/g, ' '], // Normalize spaces
+        [/([?!])([^\s?!])/g, '$1 $2'], // Add space after punctuation
+        [/\bשל\s+אני\b/gi, "שלי"], // Common Hebrew possessive fix
+        [/\bאת\s+זה\b/gi, "את זה"], // Ensure correct spacing
+        [/\bמה\s+זה\b/gi, "מה זה"], // What is this
+        [/\bאיך\s+אני\b/gi, "איך אני"], // How do I
+      ];
+      
+      hebrewFixes.forEach(([pattern, replacement]) => {
+        const newText = polished.replace(pattern, replacement);
+        if (newText !== polished) {
+          hasChanges = true;
+          polished = newText;
+        }
+      });
     } else if (/[àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ]/i.test(polished)) {
       // French/Spanish accent fixes
       const accentFixes: [RegExp, string][] = [
         [/\ba\s+la\b/gi, "à la"], // French preposition
         [/\bca\b/gi, "ça"], // French demonstrative
         [/\bno\s+se\b/gi, "no sé"], // Spanish "I don't know"
+        [/\bque\s+es\b/gi, "qué es"], // Spanish "what is"
+        [/\bcomo\s+hacer\b/gi, "cómo hacer"], // Spanish "how to do"
+        [/\bc'est\b/gi, "c'est"], // French contraction
       ];
       
       accentFixes.forEach(([pattern, replacement]) => {
+        const newText = polished.replace(pattern, replacement);
+        if (newText !== polished) {
+          hasChanges = true;
+          polished = newText;
+        }
+      });
+    } else if (/[\u3040-\u309f\u30a0-\u30ff]/i.test(polished)) {
+      // Japanese-specific fixes
+      const japaneseFixes: [RegExp, string][] = [
+        [/\s+/g, ''], // Remove spaces (Japanese doesn't use spaces)
+        [/([。！？])([^。！？\s])/g, '$1 $2'], // Add space after sentence endings
+        [/\bどうやって\b/gi, "どうやって"], // How to
+        [/\bなんですか\b/gi, "何ですか"], // What is
+      ];
+      
+      japaneseFixes.forEach(([pattern, replacement]) => {
         const newText = polished.replace(pattern, replacement);
         if (newText !== polished) {
           hasChanges = true;
@@ -193,7 +232,9 @@ export function polishText(text: string): { polished: string; wasPolished: boole
       // Arabic
       /^(كيف|ما|لماذا|متى|أين|من|أي|يمكن|ينبغي)/i,
       // Japanese
-      /^(どう|何|なぜ|いつ|どこ|誰|どの|できる|べき)/i
+      /^(どう|何|なぜ|いつ|どこ|誰|どの|できる|べき)/i,
+      // Hebrew
+      /^(איך|מה|למה|מתי|איפה|מי|איזה|יכול|צריך)/i
     ];
     
     const isQuestion = questionPatterns.some(pattern => pattern.test(polished)) || polished.includes('?');

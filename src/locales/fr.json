@@ -157,5 +157,16 @@
   "japanese": "🇯🇵 Japonais",
   "japanese_desc": "Répondre en japonais",
   "auto_detect": "🌐 Auto-détecter",
-  "auto_detect_desc": "Détecter la langue de la question"
+  "auto_detect_desc": "Détecter la langue de la question",
+  "hebrew": "🇮🇱 Hébreu",
+  "hebrew_desc": "Répondre en hébreu",
+  "open_in_favorite_ai": "Ouvrir dans votre IA favorite",
+  "send_optimized_prompt": "Envoyez votre prompt optimisé directement vers les plateformes IA populaires",
+  "open_in_chatgpt": "Ouvrir dans ChatGPT",
+  "open_in_gemini": "Ouvrir dans Gemini",
+  "copy_for_claude": "Copier pour Claude",
+  "open_in_perplexity": "Ouvrir dans Perplexity",
+  "open_in_you": "Ouvrir dans You.com",
+  "prompt_copied": "Prompt copié !",
+  "ready_paste_claude": "Prêt à coller dans Claude.ai"
 }
