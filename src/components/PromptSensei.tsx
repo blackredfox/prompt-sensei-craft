@@ -186,14 +186,30 @@ export function PromptSensei() {
   const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1-6 = questions, 7 = result
   const [answers, setAnswers] = useState<Partial<PromptAnswers>>({});
   const { user, signOut, loading } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleStart = () => {
     setCurrentStep(1);
   };
 
   const handleAnswer = (questionId: string, value: string) => {
-    setAnswers(prev => ({ ...prev, [questionId]: value }));
+    const updatedAnswers = { ...answers, [questionId]: value };
+    
+    // Set default language to current UI language if not already set
+    if (questionId === 'language' || (!updatedAnswers.language && questionId !== 'language')) {
+      const languageMap: Record<string, string> = {
+        'en': 'english',
+        'ru': 'russian', 
+        'es': 'spanish',
+        'de': 'german',
+        'fr': 'french',
+        'zh': 'chinese',
+        'ar': 'auto'
+      };
+      updatedAnswers.language = languageMap[i18n.language] || 'english';
+    }
+    
+    setAnswers(updatedAnswers);
   };
 
   const handleNext = () => {

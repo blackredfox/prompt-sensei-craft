@@ -37,5 +37,7 @@
   "error_ai_failed": "Failed to get AI response. Please try again.",
   "polish_notice": "✨ We polished your question slightly to help the AI understand better:",
   "original": "Original:",
-  "improved": "Improved:"
+  "improved": "Improved:",
+  "detailed_for_better_results": "Be as detailed as possible for better results",
+  "show_perfect_prompt": "Show me my perfect prompt"
 }

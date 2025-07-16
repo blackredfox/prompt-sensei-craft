@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ArrowRight, Check, HelpCircle, AlertTriangle } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 interface Question {
   id: string;
@@ -38,6 +39,7 @@ export function QuestionStep({
   isLastStep,
   allAnswers = {}
 }: QuestionStepProps) {
+  const { t } = useTranslation();
   const canProceed = answer.trim().length > 0;
 
   // Adaptive feedback logic
@@ -89,7 +91,7 @@ export function QuestionStep({
                 </div>
               )}
               <p className="text-sm text-muted-foreground mt-2">
-                Be as detailed as possible for better results
+                {t('detailed_for_better_results')}
               </p>
             </div>
           ) : (
@@ -157,7 +159,7 @@ export function QuestionStep({
           className="border-border/50 hover:border-primary/50"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          {t('back')}
         </Button>
 
         <Button
@@ -170,12 +172,12 @@ export function QuestionStep({
         >
           {isLastStep ? (
             <>
-              Show me my perfect prompt
+              {t('show_perfect_prompt')}
               <ArrowRight className="w-4 h-4 ml-2" />
             </>
           ) : (
             <>
-              Next
+              {t('next')}
               <ArrowRight className="w-4 h-4 ml-2" />
             </>
           )}
