@@ -43,6 +43,8 @@ export function polishText(text: string): { polished: string; wasPolished: boole
     if (/[àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ]/i.test(text)) return true;
     // German patterns
     if (/[äöüß]/i.test(text)) return true;
+    // Japanese patterns (Hiragana, Katakana)
+    if (/[\u3040-\u309f\u30a0-\u30ff]/i.test(text)) return true;
     return false;
   };
   
@@ -61,16 +63,79 @@ export function polishText(text: string): { polished: string; wasPolished: boole
       hasChanges = true;
     }
     
-    // Russian-specific fixes
+    // Language-specific fixes
     if (/[а-яё]/i.test(polished)) {
+      // Russian-specific fixes
       const russianFixes: [RegExp, string][] = [
         [/\bсколко\b/gi, "сколько"], // Common typo: "сколко" → "сколько"
         [/\bзвесзд\b/gi, "звёзд"], // Common typo: "звесзд" → "звёзд"
         [/\bчтобы\b/gi, "чтобы"], // Ensure correct form
         [/\bтакже\b/gi, "также"], // Ensure correct form
+        [/\bнадо\b/gi, "нужно"], // More formal
+        [/\bоч\b/gi, "очень"], // Common abbreviation
       ];
       
       russianFixes.forEach(([pattern, replacement]) => {
+        const newText = polished.replace(pattern, replacement);
+        if (newText !== polished) {
+          hasChanges = true;
+          polished = newText;
+        }
+      });
+    } else if (/[\u4e00-\u9fff]/i.test(polished)) {
+      // Chinese-specific fixes
+      const chineseFixes: [RegExp, string][] = [
+        [/\s+/g, ''], // Remove extra spaces (Chinese doesn't use spaces between words)
+        [/([？！])([^？！\s])/g, '$1 $2'], // Add space after question/exclamation marks
+        [/([。])([^。\s])/g, '$1 $2'], // Add space after periods
+      ];
+      
+      chineseFixes.forEach(([pattern, replacement]) => {
+        const newText = polished.replace(pattern, replacement);
+        if (newText !== polished) {
+          hasChanges = true;
+          polished = newText;
+        }
+      });
+    } else if (/[\u0600-\u06ff]/i.test(polished)) {
+      // Arabic-specific fixes
+      const arabicFixes: [RegExp, string][] = [
+        [/\s+/g, ' '], // Normalize spaces
+        [/([؟!])([^\s؟!])/g, '$1 $2'], // Add space after punctuation
+        [/[a-zA-Z]/g, ''], // Remove Latin characters (basic cleanup)
+      ];
+      
+      arabicFixes.forEach(([pattern, replacement]) => {
+        const newText = polished.replace(pattern, replacement);
+        if (newText !== polished) {
+          hasChanges = true;
+          polished = newText;
+        }
+      });
+    } else if (/[äöüß]/i.test(polished)) {
+      // German-specific fixes
+      const germanFixes: [RegExp, string][] = [
+        [/\bdas\s+das\b/gi, "dass"], // Common typo: "das das" → "dass"
+        [/\bss\b/gi, "ß"], // Sometimes ß is written as ss
+        [/\bmit\s+einem\b/gi, "mit einem"], // Ensure correct spacing
+      ];
+      
+      germanFixes.forEach(([pattern, replacement]) => {
+        const newText = polished.replace(pattern, replacement);
+        if (newText !== polished) {
+          hasChanges = true;
+          polished = newText;
+        }
+      });
+    } else if (/[àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ]/i.test(polished)) {
+      // French/Spanish accent fixes
+      const accentFixes: [RegExp, string][] = [
+        [/\ba\s+la\b/gi, "à la"], // French preposition
+        [/\bca\b/gi, "ça"], // French demonstrative
+        [/\bno\s+se\b/gi, "no sé"], // Spanish "I don't know"
+      ];
+      
+      accentFixes.forEach(([pattern, replacement]) => {
         const newText = polished.replace(pattern, replacement);
         if (newText !== polished) {
           hasChanges = true;
@@ -122,7 +187,13 @@ export function polishText(text: string): { polished: string; wasPolished: boole
       // French
       /^(comment|que|pourquoi|quand|où|qui|quel|puis-je|pourrais|devrais)/i,
       // German
-      /^(wie|was|warum|wann|wo|wer|welche|kann|könnte|sollte)/i
+      /^(wie|was|warum|wann|wo|wer|welche|kann|könnte|sollte)/i,
+      // Chinese
+      /^(怎么|什么|为什么|什么时候|哪里|谁|哪个|可以|能够|应该)/i,
+      // Arabic
+      /^(كيف|ما|لماذا|متى|أين|من|أي|يمكن|ينبغي)/i,
+      // Japanese
+      /^(どう|何|なぜ|いつ|どこ|誰|どの|できる|べき)/i
     ];
     
     const isQuestion = questionPatterns.some(pattern => pattern.test(polished)) || polished.includes('?');

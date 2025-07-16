@@ -8,6 +8,7 @@ import de from './locales/de.json';
 import fr from './locales/fr.json';
 import zh from './locales/zh.json';
 import ar from './locales/ar.json';
+import ja from './locales/ja.json';
 
 i18n
   .use(initReactI18next)
@@ -19,7 +20,8 @@ i18n
       de: { translation: de },
       fr: { translation: fr },
       zh: { translation: zh },
-      ar: { translation: ar }
+      ar: { translation: ar },
+      ja: { translation: ja }
     },
     lng: 'en', // default language
     fallbackLng: 'en',
