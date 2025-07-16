@@ -31,6 +31,20 @@ export function polishText(text: string): { polished: string; wasPolished: boole
   let polished = original;
   let hasChanges = false;
   
+  // Always apply general fixes first
+  const generalFixes: [RegExp, string][] = [
+    [/\s+/g, ' '], // Multiple spaces to single space
+    [/^\s+|\s+$/g, ''], // Trim whitespace
+  ];
+  
+  generalFixes.forEach(([pattern, replacement]) => {
+    const newText = polished.replace(pattern, replacement);
+    if (newText !== polished) {
+      hasChanges = true;
+      polished = newText;
+    }
+  });
+  
   // Detect if text is likely non-English using common patterns
   const isLikelyNonEnglish = (text: string): boolean => {
     // Russian patterns
@@ -50,142 +64,142 @@ export function polishText(text: string): { polished: string; wasPolished: boole
     return false;
   };
   
-  if (isLikelyNonEnglish(polished)) {
-    // For non-English text, just do basic cleanup
-    // Multiple spaces to single space
-    const newText = polished.replace(/\s+/g, ' ');
-    if (newText !== polished) {
-      hasChanges = true;
-      polished = newText;
-    }
+  // Apply language-specific fixes
+  if (/[а-яё]/i.test(polished)) {
+    // Russian-specific fixes
+    const russianFixes: [RegExp, string][] = [
+      [/\bсколко\b/gi, "сколько"], // Common typo: "сколко" → "сколько"
+      [/\bзвесзд\b/gi, "звёзд"], // Common typo: "звесзд" → "звёзд"
+      [/\bчтобы\b/gi, "чтобы"], // Ensure correct form
+      [/\bтакже\b/gi, "также"], // Ensure correct form
+      [/\bнадо\b/gi, "нужно"], // More formal
+      [/\bоч\b/gi, "очень"], // Common abbreviation
+      [/\bккто\b/gi, "кто"], // Common typo: "ккто" → "кто"
+      [/\bчтото\b/gi, "что-то"], // Common typo: "чтото" → "что-то"
+      [/\bзачем\s+мне\b/gi, "зачем мне"], // Ensure proper spacing
+      [/\bкак\s+дела\b/gi, "как дела"], // Common phrase
+      [/\bпридумл\b/gi, "придумал"], // Common typo: "придумл" → "придумал"
+    ];
     
-    // Capitalize first letter if it's a letter
-    if (polished && /[a-zA-Zа-яёА-ЯЁ]/.test(polished[0]) && polished[0] !== polished[0].toUpperCase()) {
-      polished = polished[0].toUpperCase() + polished.slice(1);
-      hasChanges = true;
-    }
+    russianFixes.forEach(([pattern, replacement]) => {
+      const newText = polished.replace(pattern, replacement);
+      if (newText !== polished) {
+        hasChanges = true;
+        polished = newText;
+      }
+    });
+  } else if (/[\u4e00-\u9fff]/i.test(polished)) {
+    // Chinese-specific fixes
+    const chineseFixes: [RegExp, string][] = [
+      [/\s+/g, ''], // Remove extra spaces (Chinese doesn't use spaces between words)
+      [/([？！])([^？！\s])/g, '$1 $2'], // Add space after question/exclamation marks
+      [/([。])([^。\s])/g, '$1 $2'], // Add space after periods
+      [/怎麼樣/g, "怎么样"], // Traditional to Simplified
+      [/什麼/g, "什么"], // Traditional to Simplified
+      [/為什麼/g, "为什么"], // Traditional to Simplified
+    ];
     
-    // Language-specific fixes
-    if (/[а-яё]/i.test(polished)) {
-      // Russian-specific fixes
-      const russianFixes: [RegExp, string][] = [
-        [/\bсколко\b/gi, "сколько"], // Common typo: "сколко" → "сколько"
-        [/\bзвесзд\b/gi, "звёзд"], // Common typo: "звесзд" → "звёзд"
-        [/\bчтобы\b/gi, "чтобы"], // Ensure correct form
-        [/\bтакже\b/gi, "также"], // Ensure correct form
-        [/\bнадо\b/gi, "нужно"], // More formal
-        [/\bоч\b/gi, "очень"], // Common abbreviation
-      ];
-      
-      russianFixes.forEach(([pattern, replacement]) => {
-        const newText = polished.replace(pattern, replacement);
-        if (newText !== polished) {
-          hasChanges = true;
-          polished = newText;
-        }
-      });
-    } else if (/[\u4e00-\u9fff]/i.test(polished)) {
-      // Chinese-specific fixes
-      const chineseFixes: [RegExp, string][] = [
-        [/\s+/g, ''], // Remove extra spaces (Chinese doesn't use spaces between words)
-        [/([？！])([^？！\s])/g, '$1 $2'], // Add space after question/exclamation marks
-        [/([。])([^。\s])/g, '$1 $2'], // Add space after periods
-      ];
-      
-      chineseFixes.forEach(([pattern, replacement]) => {
-        const newText = polished.replace(pattern, replacement);
-        if (newText !== polished) {
-          hasChanges = true;
-          polished = newText;
-        }
-      });
-    } else if (/[\u0600-\u06ff]/i.test(polished)) {
-      // Arabic-specific fixes
-      const arabicFixes: [RegExp, string][] = [
-        [/\s+/g, ' '], // Normalize spaces
-        [/([؟!])([^\s؟!])/g, '$1 $2'], // Add space after punctuation
-        [/[a-zA-Z]/g, ''], // Remove Latin characters (basic cleanup)
-      ];
-      
-      arabicFixes.forEach(([pattern, replacement]) => {
-        const newText = polished.replace(pattern, replacement);
-        if (newText !== polished) {
-          hasChanges = true;
-          polished = newText;
-        }
-      });
-    } else if (/[äöüß]/i.test(polished)) {
-      // German-specific fixes
-      const germanFixes: [RegExp, string][] = [
-        [/\bdas\s+das\b/gi, "dass"], // Common typo: "das das" → "dass"
-        [/\bss\b/gi, "ß"], // Sometimes ß is written as ss
-        [/\bmit\s+einem\b/gi, "mit einem"], // Ensure correct spacing
-      ];
-      
-      germanFixes.forEach(([pattern, replacement]) => {
-        const newText = polished.replace(pattern, replacement);
-        if (newText !== polished) {
-          hasChanges = true;
-          polished = newText;
-        }
-      });
-    } else if (/[\u0590-\u05ff]/i.test(polished)) {
-      // Hebrew-specific fixes
-      const hebrewFixes: [RegExp, string][] = [
-        [/\s+/g, ' '], // Normalize spaces
-        [/([?!])([^\s?!])/g, '$1 $2'], // Add space after punctuation
-        [/\bשל\s+אני\b/gi, "שלי"], // Common Hebrew possessive fix
-        [/\bאת\s+זה\b/gi, "את זה"], // Ensure correct spacing
-        [/\bמה\s+זה\b/gi, "מה זה"], // What is this
-        [/\bאיך\s+אני\b/gi, "איך אני"], // How do I
-      ];
-      
-      hebrewFixes.forEach(([pattern, replacement]) => {
-        const newText = polished.replace(pattern, replacement);
-        if (newText !== polished) {
-          hasChanges = true;
-          polished = newText;
-        }
-      });
-    } else if (/[àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ]/i.test(polished)) {
-      // French/Spanish accent fixes
-      const accentFixes: [RegExp, string][] = [
-        [/\ba\s+la\b/gi, "à la"], // French preposition
-        [/\bca\b/gi, "ça"], // French demonstrative
-        [/\bno\s+se\b/gi, "no sé"], // Spanish "I don't know"
-        [/\bque\s+es\b/gi, "qué es"], // Spanish "what is"
-        [/\bcomo\s+hacer\b/gi, "cómo hacer"], // Spanish "how to do"
-        [/\bc'est\b/gi, "c'est"], // French contraction
-      ];
-      
-      accentFixes.forEach(([pattern, replacement]) => {
-        const newText = polished.replace(pattern, replacement);
-        if (newText !== polished) {
-          hasChanges = true;
-          polished = newText;
-        }
-      });
-    } else if (/[\u3040-\u309f\u30a0-\u30ff]/i.test(polished)) {
-      // Japanese-specific fixes
-      const japaneseFixes: [RegExp, string][] = [
-        [/\s+/g, ''], // Remove spaces (Japanese doesn't use spaces)
-        [/([。！？])([^。！？\s])/g, '$1 $2'], // Add space after sentence endings
-        [/\bどうやって\b/gi, "どうやって"], // How to
-        [/\bなんですか\b/gi, "何ですか"], // What is
-      ];
-      
-      japaneseFixes.forEach(([pattern, replacement]) => {
-        const newText = polished.replace(pattern, replacement);
-        if (newText !== polished) {
-          hasChanges = true;
-          polished = newText;
-        }
-      });
-    }
-  } else {
+    chineseFixes.forEach(([pattern, replacement]) => {
+      const newText = polished.replace(pattern, replacement);
+      if (newText !== polished) {
+        hasChanges = true;
+        polished = newText;
+      }
+    });
+  } else if (/[\u0600-\u06ff]/i.test(polished)) {
+    // Arabic-specific fixes
+    const arabicFixes: [RegExp, string][] = [
+      [/([؟!])([^\s؟!])/g, '$1 $2'], // Add space after punctuation
+      [/[a-zA-Z]/g, ''], // Remove Latin characters (basic cleanup)
+      [/\bماذا\s+تعني\b/gi, "ماذا تعني"], // What do you mean
+      [/\bكيف\s+يمكنني\b/gi, "كيف يمكنني"], // How can I
+      [/\bأريد\s+أن\b/gi, "أريد أن"], // I want to
+    ];
+    
+    arabicFixes.forEach(([pattern, replacement]) => {
+      const newText = polished.replace(pattern, replacement);
+      if (newText !== polished) {
+        hasChanges = true;
+        polished = newText;
+      }
+    });
+  } else if (/[äöüß]/i.test(polished)) {
+    // German-specific fixes
+    const germanFixes: [RegExp, string][] = [
+      [/\bdas\s+das\b/gi, "dass"], // Common typo: "das das" → "dass"
+      [/\bwie\s+geht\b/gi, "wie geht"], // Common phrase
+      [/\bich\s+moechte\b/gi, "ich möchte"], // I would like
+      [/\bkoennen\s+sie\b/gi, "können Sie"], // Can you
+      [/\bwarum\s+ist\b/gi, "warum ist"], // Why is
+    ];
+    
+    germanFixes.forEach(([pattern, replacement]) => {
+      const newText = polished.replace(pattern, replacement);
+      if (newText !== polished) {
+        hasChanges = true;
+        polished = newText;
+      }
+    });
+  } else if (/[\u0590-\u05ff]/i.test(polished)) {
+    // Hebrew-specific fixes
+    const hebrewFixes: [RegExp, string][] = [
+      [/([?!])([^\s?!])/g, '$1 $2'], // Add space after punctuation
+      [/\bשל\s+אני\b/gi, "שלי"], // Common Hebrew possessive fix
+      [/\bאת\s+זה\b/gi, "את זה"], // Ensure correct spacing
+      [/\bמהזה\b/gi, "מה זה"], // What is this (common typo)
+      [/\bאיך\s+אני\b/gi, "איך אני"], // How do I
+      [/\bכיצדלבשל\b/gi, "כיצד לבשל"], // How to cook (common mistake)
+      [/\bמה\s+עושים\b/gi, "מה עושים"], // What do we do
+    ];
+    
+    hebrewFixes.forEach(([pattern, replacement]) => {
+      const newText = polished.replace(pattern, replacement);
+      if (newText !== polished) {
+        hasChanges = true;
+        polished = newText;
+      }
+    });
+  } else if (/[àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ]/i.test(polished)) {
+    // French/Spanish accent fixes
+    const accentFixes: [RegExp, string][] = [
+      [/\ba\s+la\b/gi, "à la"], // French preposition
+      [/\bca\b/gi, "ça"], // French demonstrative
+      [/\bno\s+se\b/gi, "no sé"], // Spanish "I don't know"
+      [/\bque\s+es\b/gi, "qué es"], // Spanish "what is"
+      [/\bcomo\s+hacer\b/gi, "cómo hacer"], // Spanish "how to do"
+      [/\bc'est\b/gi, "c'est"], // French contraction
+      [/\bquelle est la difference\b/gi, "quelle est la différence"], // French what's the difference
+      [/\bcomment\s+faire\b/gi, "comment faire"], // French how to do
+    ];
+    
+    accentFixes.forEach(([pattern, replacement]) => {
+      const newText = polished.replace(pattern, replacement);
+      if (newText !== polished) {
+        hasChanges = true;
+        polished = newText;
+      }
+    });
+  } else if (/[\u3040-\u309f\u30a0-\u30ff]/i.test(polished)) {
+    // Japanese-specific fixes
+    const japaneseFixes: [RegExp, string][] = [
+      [/\s+/g, ''], // Remove spaces (Japanese doesn't use spaces)
+      [/([。！？])([^。！？\s])/g, '$1 $2'], // Add space after sentence endings
+      [/\bどうやって\b/gi, "どうやって"], // How to
+      [/\bなんですか\b/gi, "何ですか"], // What is
+      [/\bどこで\b/gi, "どこで"], // Where
+      [/\bいつ\b/gi, "いつ"], // When
+    ];
+    
+    japaneseFixes.forEach(([pattern, replacement]) => {
+      const newText = polished.replace(pattern, replacement);
+      if (newText !== polished) {
+        hasChanges = true;
+        polished = newText;
+      }
+    });
+  } else if (!isLikelyNonEnglish(polished)) {
     // English grammar fixes
-    const fixes: [RegExp, string][] = [
-      [/\s+/g, ' '], // Multiple spaces to single space
+    const englishFixes: [RegExp, string][] = [
       [/\bi\b/g, 'I'], // Lowercase 'i' to 'I'
       [/\bim\b/gi, "I'm"], // 'im' to "I'm"
       [/\bdont\b/gi, "don't"], // 'dont' to "don't"
@@ -195,22 +209,18 @@ export function polishText(text: string): { polished: string; wasPolished: boole
       [/\barent\b/gi, "aren't"], // 'arent' to "aren't"
       [/\bsaj\b/gi, "say"], // Common typo
       [/\bto do not\b/gi, "not to"], // Grammar fix
-      [/\bwow can i\b/gi, "How can I"], // Common start
+      [/\bwho eat dgs\b/gi, "who eats dogs"], // Example from the user
+      [/\bhow can i\b/gi, "How can I"], // Capitalize start
+      [/\bwow can i\b/gi, "How can I"], // Common start typo
     ];
     
-    fixes.forEach(([pattern, replacement]) => {
+    englishFixes.forEach(([pattern, replacement]) => {
       const newText = polished.replace(pattern, replacement);
       if (newText !== polished) {
         hasChanges = true;
         polished = newText;
       }
     });
-    
-    // Capitalize first letter
-    if (polished && polished[0] !== polished[0].toUpperCase()) {
-      polished = polished[0].toUpperCase() + polished.slice(1);
-      hasChanges = true;
-    }
   }
   
   // Ensure proper sentence ending for all languages

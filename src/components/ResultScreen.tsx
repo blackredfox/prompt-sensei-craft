@@ -284,12 +284,24 @@ function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage
     }
   }
 
-  // Add language preference with enhanced instructions
+  // Add language preference with enhanced instructions for all languages
   if (!isEnglish) {
     if (currentLanguage === 'ru') {
       prompt += ` ВАЖНО: Отвечайте полностью на русском языке. Используйте родной уровень русского языка с правильной грамматикой, культурным контекстом и идиоматическими выражениями. Если первоначальный вопрос был на английском или другом языке, переведите ваше понимание и отвечайте полностью на русском языке. Убедитесь, что все объяснения, примеры и детали культурно подходят для русскоязычных.`;
     } else if (currentLanguage === 'es') {
       prompt += ` IMPORTANTE: Responde completamente en español. Usa español de nivel nativo con gramática adecuada, contexto cultural y expresiones idiomáticas. Si la pregunta original estaba en inglés u otro idioma, traduce tu comprensión y responde completamente en español. Asegúrate de que todas las explicaciones, ejemplos y detalles sean culturalmente apropiados para hablantes de español.`;
+    } else if (currentLanguage === 'fr') {
+      prompt += ` IMPORTANT: Répondez entièrement en français. Utilisez un français de niveau natif avec une grammaire appropriée, un contexte culturel et des expressions idiomatiques. Si la question originale était en anglais ou dans une autre langue, traduisez votre compréhension et répondez entièrement en français. Assurez-vous que toutes les explications, exemples et détails sont culturellement appropriés pour les francophones.`;
+    } else if (currentLanguage === 'de') {
+      prompt += ` WICHTIG: Antworten Sie vollständig auf Deutsch. Verwenden Sie muttersprachliches Deutsch mit angemessener Grammatik, kulturellem Kontext und idiomatischen Ausdrücken. Wenn die ursprüngliche Frage auf Englisch oder in einer anderen Sprache war, übersetzen Sie Ihr Verständnis und antworten Sie vollständig auf Deutsch. Stellen Sie sicher, dass alle Erklärungen, Beispiele und Details kulturell für deutsche Sprecher geeignet sind.`;
+    } else if (currentLanguage === 'zh') {
+      prompt += ` 重要：请完全用中文回答。使用母语水平的中文，包括正确的语法、文化背景和习语表达。如果原始问题是英文或其他语言，请翻译您的理解并完全用中文回答。确保所有解释、例子和细节都适合中文使用者的文化背景。`;
+    } else if (currentLanguage === 'ar') {
+      prompt += ` مهم: أجب كاملاً باللغة العربية. استخدم العربية بمستوى الناطق الأصلي مع القواعد المناسبة والسياق الثقافي والتعبيرات الاصطلاحية. إذا كان السؤال الأصلي بالإنجليزية أو لغة أخرى، ترجم فهمك وأجب كاملاً بالعربية. تأكد من أن جميع التفسيرات والأمثلة والتفاصيل مناسبة ثقافياً للمتحدثين بالعربية.`;
+    } else if (currentLanguage === 'ja') {
+      prompt += ` 重要：完全に日本語で回答してください。適切な文法、文化的背景、慣用表現を含む母語レベルの日本語を使用してください。元の質問が英語や他の言語だった場合は、理解を翻訳し、完全に日本語で回答してください。すべての説明、例、詳細が日本語話者にとって文化的に適切であることを確認してください。`;
+    } else if (currentLanguage === 'he') {
+      prompt += ` חשוב: ענה באופן מלא בעברית. השתמש בעברית ברמת דובר שפת אם עם דקדוק מתאים, הקשר תרבותי וביטויים אידיומטיים. אם השאלה המקורית הייתה באנגלית או בשפה אחרת, תרגם את ההבנה שלך וענה באופן מלא בעברית. ודא שכל ההסברים, הדוגמאות והפרטים מתאימים תרבותית לדוברי עברית.`;
     } else {
       prompt += ` IMPORTANT: Respond entirely in ${targetLanguage}. Use native-level ${targetLanguage} with proper grammar, cultural context, and idiomatic expressions. If the original question was in English or another language, translate your understanding and respond completely in ${targetLanguage}. Ensure all explanations, examples, and details are culturally appropriate for ${targetLanguage} speakers.`;
     }
@@ -297,54 +309,42 @@ function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage
     prompt += ` Respond in clear, fluent English.`;
   }
 
-  // Generate explanation in the UI language
+  // Generate explanation in the UI language using translation keys
   explanation = t('why_prompt_works') + `:\n\n`;
   
   if (detectedPersona && complexity === "optimize") {
-    explanation += `• **${currentLanguage === 'ru' ? 'Умное определение персоны' : currentLanguage === 'es' ? 'Detección Inteligente de Persona' : 'Smart Persona Detection'}**: ${currentLanguage === 'ru' ? 'Я автоматически определил вашу тему и назначил специализированную экспертную роль для обеспечения авторитетных, релевантных ответов.' : currentLanguage === 'es' ? 'Detecté automáticamente tu tema y asigné un rol de experto especializado para asegurar respuestas autorizadas y relevantes.' : 'I automatically detected your topic and assigned a specialized expert role to ensure authoritative, relevant responses.'}\n\n`;
+    explanation += `• **${t('smart_persona_detection')}**: ${t('smart_persona_detection_desc')}\n\n`;
   } else if (complexity === "optimize") {
-    explanation += `• **${currentLanguage === 'ru' ? 'Определение роли' : currentLanguage === 'es' ? 'Definición de Rol' : 'Role Definition'}**: ${currentLanguage === 'ru' ? `Я настроил ИИ с конкретной персоной (${tone}) для обеспечения последовательного голоса на протяжении всего ответа.` : currentLanguage === 'es' ? `Configuré la IA con una persona específica (${tone}) para asegurar una voz consistente a lo largo de la respuesta.` : `I set up the AI with a specific persona (${tone}) to ensure consistent voice throughout the response.`}\n\n`;
+    explanation += `• **${t('role_definition')}**: ${t('role_definition_desc', { tone })}\n\n`;
   }
   
-  explanation += `• **${currentLanguage === 'ru' ? 'Ясное намерение' : currentLanguage === 'es' ? 'Intención Clara' : 'Clear Intent'}**: ${currentLanguage === 'ru' ? 'Ваш основной вопрос изложен прямо и ясно.' : currentLanguage === 'es' ? 'Tu pregunta principal está planteada directa y claramente.' : 'Your core question is stated directly and clearly.'}\n\n`;
+  explanation += `• **${t('clear_intent')}**: ${t('clear_intent_desc')}\n\n`;
   
   if (complexity === "optimize") {
-    const audienceText = audience === "myself" ? (currentLanguage === 'ru' ? "личного использования" : currentLanguage === 'es' ? "uso personal" : "personal use") : 
-                        audience === "client" ? (currentLanguage === 'ru' ? "клиента" : currentLanguage === 'es' ? "un cliente" : "a client") : 
-                        audience === "manager" ? (currentLanguage === 'ru' ? "руководства" : currentLanguage === 'es' ? "gerencia" : "management") : 
-                        audience === "code" ? (currentLanguage === 'ru' ? "генерации кода с техническим руководством" : currentLanguage === 'es' ? "generación de código con guía técnica" : "code generation with technical guidance") : 
-                        (currentLanguage === 'ru' ? "общей аудитории" : currentLanguage === 'es' ? "una audiencia general" : "a general audience");
-    
-    explanation += `• **${currentLanguage === 'ru' ? 'Контекст аудитории' : currentLanguage === 'es' ? 'Contexto de Audiencia' : 'Audience Context'}**: ${currentLanguage === 'ru' ? `Я указал, что это для ${audienceText}, что помогает ИИ настроить сложность и тон.` : currentLanguage === 'es' ? `Especifiqué que esto es para ${audienceText}, lo que ayuda a la IA a adaptar la complejidad y el tono.` : `I specified that this is for ${audienceText}, which helps the AI tailor the complexity and tone.`}\n\n`;
+    explanation += `• **${t('audience_context')}**: ${t('audience_context_desc', { audience: t(`audience_${audience}`) })}\n\n`;
   }
   
-  const formatText = format === "bullet" ? (currentLanguage === 'ru' ? "маркированные пункты" : currentLanguage === 'es' ? "puntos con viñetas" : "bullet points") : 
-                    format === "steps" ? (currentLanguage === 'ru' ? "пошаговый формат" : currentLanguage === 'es' ? "formato paso a paso" : "step-by-step format") : 
-                    (currentLanguage === 'ru' ? "формат абзаца" : currentLanguage === 'es' ? "formato de párrafo" : "paragraph format");
-  
-  explanation += `• **${currentLanguage === 'ru' ? 'Спецификация формата' : currentLanguage === 'es' ? 'Especificación de Formato' : 'Format Specification'}**: ${currentLanguage === 'ru' ? `Я запросил ${formatText} в соответствии с вашими предпочтениями.` : currentLanguage === 'es' ? `Solicité ${formatText} para coincidir con tu preferencia.` : `I requested ${formatText} to match your preference.`}\n\n`;
+  explanation += `• **${t('format_specification')}**: ${t('format_specification_desc', { format: t(`format_${format}`) })}\n\n`;
   
   if (complexity === "optimize") {
-    explanation += `• **${currentLanguage === 'ru' ? 'Руководство по тону' : currentLanguage === 'es' ? 'Guía de Tono' : 'Tone Guidance'}**: ${currentLanguage === 'ru' ? `Я добавил конкретные инструкции для поддержания ${tone} подхода на протяжении всего ответа.` : currentLanguage === 'es' ? `Agregué instrucciones específicas para mantener un enfoque ${tone} a lo largo de la respuesta.` : `I added specific instructions to maintain a ${tone} approach throughout the response.`}\n\n`;
+    explanation += `• **${t('tone_guidance')}**: ${t('tone_guidance_desc', { tone: t(`tone_${tone}`) })}\n\n`;
   }
 
   if (depth === "deep") {
-    explanation += `• **${currentLanguage === 'ru' ? 'Режим глубокого поиска' : currentLanguage === 'es' ? 'Modo de Búsqueda Profunda' : 'DeepSearch Mode'}**: ${currentLanguage === 'ru' ? 'Я включил тщательный анализ с выводами, основанными на исследованиях, сравнениями и реальными примерами для всеобъемлющих ответов.' : currentLanguage === 'es' ? 'Habilité análisis exhaustivo con insights basados en investigación, comparaciones y ejemplos del mundo real para respuestas comprehensivas.' : 'I enabled thorough analysis with research-based insights, comparisons, and real-world examples for comprehensive responses.'}\n\n`;
+    explanation += `• **${t('deepsearch_mode')}**: ${t('deepsearch_mode_desc')}\n\n`;
   }
 
   if (insightMode === "deep") {
-    explanation += `• **${currentLanguage === 'ru' ? 'Режим глубокого анализа' : currentLanguage === 'es' ? 'Modo de Análisis Profundo' : 'Deep Insight Mode'}**: ${currentLanguage === 'ru' ? 'Я добавил инструкции для ИИ анализировать глубоко, сравнивать перспективы и предоставлять реальные примеры для лучшего рассуждения.' : currentLanguage === 'es' ? 'Agregué instrucciones para que la IA analice profundamente, compare perspectivas y proporcione ejemplos del mundo real para mejor razonamiento.' : 'I added instructions for the AI to analyze deeply, compare perspectives, and provide real-world examples for better reasoning.'}\n\n`;
+    explanation += `• **${t('deep_insight_mode')}**: ${t('deep_insight_mode_desc')}\n\n`;
   }
 
   if (!isEnglish) {
-    explanation += `• **${currentLanguage === 'ru' ? 'Расширенная многоязычная поддержка' : currentLanguage === 'es' ? 'Soporte Multilingüe Mejorado' : 'Enhanced Multilingual Support'}**: ${currentLanguage === 'ru' ? `Я добавил строгие инструкции для ИИ отвечать полностью на ${targetLanguage} языке с родным уровнем беглости, правильным культурным контекстом и идиоматическими выражениями. Это обеспечивает аутентичную коммуникацию независимо от языка вашего ввода.` : currentLanguage === 'es' ? `Agregué instrucciones estrictas para que la IA responda completamente en ${targetLanguage} con fluidez de nivel nativo, contexto cultural apropiado y expresiones idiomáticas. Esto asegura comunicación auténtica independientemente del idioma de tu entrada.` : `I added strong instructions for the AI to respond entirely in ${targetLanguage} with native-level fluency, proper cultural context, and idiomatic expressions. This ensures authentic communication regardless of your input language.`}\n\n`;
+    explanation += `• **${t('multilingual_support')}**: ${t('multilingual_support_desc', { language: targetLanguage })}\n\n`;
   } else {
-    explanation += `• **${currentLanguage === 'ru' ? 'Настройка языка' : currentLanguage === 'es' ? 'Configuración de Idioma' : 'Language Setting'}**: ${currentLanguage === 'ru' ? 'Я убедился, что ответ будет на чистом, беглом английском языке.' : currentLanguage === 'es' ? 'Me aseguré de que la respuesta esté en inglés claro y fluido.' : 'I ensured the response will be in clear, fluent English.'}\n\n`;
+    explanation += `• **${t('language_setting')}**: ${t('language_setting_desc')}\n\n`;
   }
   
-  explanation += currentLanguage === 'ru' ? 'Эти элементы работают вместе, чтобы дать вам более релевантные, хорошо структурированные ответы, соответствующие вашим конкретным потребностям.' : 
-                currentLanguage === 'es' ? 'Estos elementos trabajan juntos para darte respuestas más relevantes y bien estructuradas que coinciden con tus necesidades específicas.' :
-                'These elements work together to give you more relevant, well-structured responses that match your specific needs.';
+  explanation += t('prompt_elements_conclusion');
 
   return { prompt, explanation, polishInfo };
 }
