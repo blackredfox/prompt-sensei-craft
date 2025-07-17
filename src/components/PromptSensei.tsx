@@ -29,7 +29,10 @@ async function polishWithOpenAI(text: string): Promise<string> {
   try {
     const response = await fetch('https://azfpisirgvrosciqhlss.supabase.co/functions/v1/polish-text', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6ZnBpc2lyZ3Zyb3NjaXFobHNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI2MjI5NTIsImV4cCI6MjA2ODE5ODk1Mn0.VYvNDckJY1U78bJkjtfBnP4uqftQTwO1RSkhGlnjh94`
+      },
       body: JSON.stringify({ text }),
     });
     
