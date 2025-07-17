@@ -153,13 +153,41 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   // Get localized strings or fall back to English
   const currentLocalizedPrompts = localizedPrompts[currentLanguage as keyof typeof localizedPrompts];
 
+  // Expert role enrichment for professional tone with deep insight/analysis needs
+  const shouldAddExpertRole = tone === "professional" && 
+    (insightMode === "deep" || depth === "deep") &&
+    !finalQuestion.toLowerCase().includes("expert") && 
+    !finalQuestion.toLowerCase().includes("консультант") &&
+    !finalQuestion.toLowerCase().includes("experto") &&
+    !finalQuestion.toLowerCase().includes("consultant");
+
+  // Expert role prefixes by language
+  const expertRolePrefixes = {
+    en: "You are an expert consultant with deep knowledge in your field. ",
+    es: "Eres un consultor experto con profundo conocimiento en tu campo. ",
+    ru: "Ты эксперт с глубокими знаниями в своей области. ",
+    de: "Du bist ein erfahrener Berater mit umfassendem Fachwissen in deinem Bereich. ",
+    fr: "Vous êtes un consultant expert avec une connaissance approfondie de votre domaine. ",
+    pt: "Você é um consultor especialista com profundo conhecimento em sua área. ",
+    it: "Sei un consulente esperto con una profonda conoscenza nel tuo campo. ",
+    uk: "Ви експерт із глибокими знаннями у своїй галузі. ",
+    pl: "Jesteś ekspertem z głęboką wiedzą w swojej dziedzinie. "
+  };
+
   // Auto-detect persona first and add it at the beginning for Russian
   const detectedPersona = detectPersona(finalQuestion);
   let hasPersona = false;
+  let expertRoleAdded = false;
   
   if (detectedPersona && complexity === "optimize") {
     prompt += detectedPersona;
     hasPersona = true;
+  } else if (shouldAddExpertRole && complexity === "optimize") {
+    // Add expert role enrichment
+    const expertPrefix = expertRolePrefixes[currentLanguage as keyof typeof expertRolePrefixes] || expertRolePrefixes.en;
+    prompt += expertPrefix;
+    hasPersona = true;
+    expertRoleAdded = true;
   } else if (complexity === "optimize") {
     // Use localized persona or fallback to English
     if (currentLocalizedPrompts?.persona[tone as keyof typeof currentLocalizedPrompts.persona]) {
@@ -169,6 +197,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
       // Fallback to English
       switch (tone) {
         case "expert":
+        case "professional":
           prompt += "You are an expert consultant with deep knowledge in your field. ";
           break;
         case "friendly":
@@ -305,6 +334,24 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
     }
   }
 
+  // Add clarity and structure suffix for expert role enrichment
+  let expertClaritySuffix = "";
+  if (expertRoleAdded) {
+    const clarityStructureSuffixes = {
+      en: " Provide a structured, step-by-step explanation with examples. Respond in clear, fluent English.",
+      es: " Proporciona una explicación estructurada paso a paso con ejemplos. Responde en un español claro y fluido.",
+      ru: " Дай пошаговое объяснение с примерами. Отвечай ясно и грамотно.",
+      de: " Erkläre strukturiert und schrittweise mit Beispielen. Antworte in klarem, fließendem Deutsch.",
+      fr: " Fournissez une explication structurée, étape par étape, avec des exemples. Répondez en français clair et fluide.",
+      pt: " Forneça uma explicação estruturada, passo a passo, com exemplos. Responda em português claro e fluente.",
+      it: " Fornisci una spiegazione strutturata, passo dopo passo, con esempi. Rispondi in italiano chiaro e fluente.",
+      uk: " Надайте структуроване поетапне пояснення з прикладами. Відповідайте чіткою, грамотною українською мовою.",
+      pl: " Podaj uporządkowane, krok po kroku wyjaśnienie z przykładami. Odpowiadaj jasno i poprawną polszczyzną."
+    };
+    
+    expertClaritySuffix = clarityStructureSuffixes[currentLanguage as keyof typeof clarityStructureSuffixes] || clarityStructureSuffixes.en;
+  }
+
   // Add language preference with enhanced instructions for all languages
   if (!isEnglish) {
     if (currentLanguage === 'ru') {
@@ -328,6 +375,11 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
     }
   } else {
     prompt += ` Respond in clear, fluent English.`;
+  }
+
+  // Add expert clarity suffix after language instructions
+  if (expertClaritySuffix) {
+    prompt += expertClaritySuffix;
   }
 
   // Generate explanation in the UI language using translation keys
