@@ -25,6 +25,7 @@ export interface PromptAnswers {
 
 // Grammar and polish utility functions with OpenAI fallback
 async function polishWithOpenAI(text: string): Promise<string> {
+  console.log('[🔁 calling polish-text]', text);
   try {
     const response = await fetch('https://azfpisirgvrosciqhlss.supabase.co/functions/v1/polish-text', {
       method: 'POST',
@@ -34,10 +35,15 @@ async function polishWithOpenAI(text: string): Promise<string> {
     
     if (response.ok) {
       const data = await response.json();
+      console.log('[✅ polish-text response]', data.polished);
       return data.polished || text;
+    } else {
+      console.error('[❌ polish-text error] Status:', response.status, response.statusText);
+      const errorText = await response.text();
+      console.error('Error details:', errorText);
     }
   } catch (error) {
-    console.log('OpenAI polish fallback failed:', error);
+    console.error('[❌ polish-text error]', error);
   }
   return text;
 }
@@ -307,23 +313,28 @@ export function polishText(text: string): { polished: string; wasPolished: boole
 
 // Enhanced async polishText with OpenAI fallback for English
 export async function polishTextAsync(text: string, language?: string): Promise<{ polished: string; wasPolished: boolean }> {
+  console.log('[⚠️ polishTextAsync] input text:', text);
   const original = text.trim();
   if (!original) return { polished: original, wasPolished: false };
   
   // Try local rules first
   const localResult = polishText(text);
   
-  // If no local improvements and language is English, try OpenAI
-  if (!localResult.wasPolished && language === 'en') {
-    console.log('[Polish Fallback] Triggering OpenAI for:', text);
+  // If language is English, always try OpenAI for any text that might have errors
+  // This ensures grammar errors like "doo" and "wants" get corrected
+  if (language === 'en') {
+    console.log('[Polish Fallback] Triggering OpenAI for English text:', text);
     try {
       const openAIPolished = await polishWithOpenAI(text);
       if (openAIPolished !== text) {
+        console.log('[Polish Success] OpenAI correction applied:', openAIPolished);
         return { polished: openAIPolished, wasPolished: true };
+      } else {
+        console.log('[Polish Info] OpenAI returned same text (no changes needed)');
       }
     } catch (error) {
       console.error('Error with OpenAI polish:', error);
-      // Fall back to original text
+      // Fall back to local result
     }
   }
   

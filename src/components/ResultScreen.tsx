@@ -45,18 +45,24 @@ function detectPersona(question: string): string {
   return "";
 }
 
-async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage: string): Promise<{ prompt: string; explanation: string; polishInfo?: { original: string; polished: string } }> {
+async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage: string): Promise<{ prompt: string; explanation: string; polishInfo?: { original: string; polished: string }; polishAttempted?: boolean }> {
   const { question, audience, tone, format, complexity, depth, polishInput, insightMode, language } = answers;
   
   // Polish the question if requested
   let finalQuestion = question;
   let polishInfo: { original: string; polished: string } | undefined;
+  let polishAttempted = false;
   
   if (polishInput === "true") {
+    polishAttempted = true;
+    console.log('[⚠️ Attempting to polish]', question, 'Language:', currentLanguage);
     const { polished, wasPolished } = await polishTextAsync(question, currentLanguage);
     if (wasPolished) {
+      console.log('[✅ Polish success]', polished);
       polishInfo = { original: question, polished };
       finalQuestion = polished;
+    } else {
+      console.log('[ℹ️ Polish unchanged]', question);
     }
   }
   
@@ -370,17 +376,24 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
   const [error, setError] = useState<string | null>(null);
   const [prompt, setPrompt] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
+  // State tracking for polish attempts that failed or succeeded
   const [polishInfo, setPolishInfo] = useState<{ original: string; polished: string } | undefined>();
+  const [polishAttemptedNoEffect, setPolishAttemptedNoEffect] = useState<boolean>(false);
   const { toast } = useToast();
   const { savePrompt } = usePromptLibrary();
   const { t, i18n } = useTranslation();
   
   // Generate the optimized prompt on component mount and when answers change
   useEffect(() => {
-    generateOptimizedPrompt(answers, t, i18n.language).then(({ prompt, explanation, polishInfo }) => {
+    generateOptimizedPrompt(answers, t, i18n.language).then(({ prompt, explanation, polishInfo, polishAttempted }) => {
       setPrompt(prompt);
       setExplanation(explanation);
       setPolishInfo(polishInfo);
+      // Track if polish was attempted but had no effect
+      setPolishAttemptedNoEffect(polishAttempted && !polishInfo);
+      if (polishAttempted && !polishInfo) {
+        console.log('[⚠️ Polish attempted but no changes made]');
+      }
     });
   }, [answers, t, i18n.language]);
 
@@ -484,6 +497,22 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
                         <span className="font-mono bg-primary/10 px-2 py-1 rounded border">{t('improved')}</span> {polishInfo.polished}
                       </div>
                     </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Debug indicator when polish was attempted but had no effect */}
+          {polishAttemptedNoEffect && (
+            <Card className="border-border/50 bg-yellow-50 dark:bg-yellow-950/20 backdrop-blur-sm">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-2">
+                  <Info className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                      [Debug] Polish function was triggered but no changes were made. This could indicate that the OpenAI polish service wasn't reached or didn't apply changes.
+                    </p>
                   </div>
                 </div>
               </CardContent>
