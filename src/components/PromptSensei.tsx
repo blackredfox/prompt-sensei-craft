@@ -23,7 +23,25 @@ export interface PromptAnswers {
   language?: string;
 }
 
-// Grammar and polish utility functions
+// Grammar and polish utility functions with OpenAI fallback
+async function polishWithOpenAI(text: string): Promise<string> {
+  try {
+    const response = await fetch('https://azfpisirgvrosciqhlss.supabase.co/functions/v1/polish-text', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data.polished || text;
+    }
+  } catch (error) {
+    console.log('OpenAI polish fallback failed:', error);
+  }
+  return text;
+}
+
 export function polishText(text: string): { polished: string; wasPolished: boolean } {
   const original = text.trim();
   if (!original) return { polished: original, wasPolished: false };
@@ -218,6 +236,14 @@ export function polishText(text: string): { polished: string; wasPolished: boole
       [/\bwont\b/gi, "won't"], // 'wont' to "won't"
       [/\bisnt\b/gi, "isn't"], // 'isnt' to "isn't"
       [/\barent\b/gi, "aren't"], // 'arent' to "aren't"
+      [/\bwaant\b/gi, "want"], // Common typo: "waant" → "want"
+      [/\bteh\b/gi, "the"], // Common typo: "teh" → "the"
+      [/\brecieve\b/gi, "receive"], // Common typo: "recieve" → "receive"
+      [/\bdefinately\b/gi, "definitely"], // Common typo
+      [/\boccured\b/gi, "occurred"], // Common typo
+      [/\bseparate\b/gi, "separate"], // Often misspelled
+      [/\bneccesary\b/gi, "necessary"], // Common typo
+      [/\bbegginer\b/gi, "beginner"], // Common typo
       [/\bsaj\b/gi, "say"], // Common typo
       [/\bto do not\b/gi, "not to"], // Grammar fix
       [/\bwho eat dgs\b/gi, "who eats dogs"], // Example from the user
@@ -225,6 +251,17 @@ export function polishText(text: string): { polished: string; wasPolished: boole
       [/\bhow can i\b/gi, "How can I"], // Capitalize start
       [/\bwow can i\b/gi, "How can I"], // Common start typo
       [/\bwho eat\b/gi, "who eats"], // Fix grammar "who eat" -> "who eats"
+      [/\byour\s+welcome\b/gi, "you're welcome"], // Grammar fix
+      [/\bits\s+a\s+nice\s+day\b/gi, "it's a nice day"], // Grammar fix
+      [/\bthere\s+car\b/gi, "their car"], // Grammar fix
+      [/\bwhere\s+going\b/gi, "where are you going"], // Grammar completion
+      [/\bhow\s+much\s+cost\b/gi, "how much does it cost"], // Grammar completion
+      [/\bwhat\s+time\s+is\b/gi, "what time is it"], // Grammar completion
+      [/\bi\s+can\s+has\b/gi, "I can have"], // Grammar fix
+      [/\bmust\s+of\b/gi, "must have"], // Common error
+      [/\bcould\s+of\b/gi, "could have"], // Common error
+      [/\bshould\s+of\b/gi, "should have"], // Common error
+      [/\bwould\s+of\b/gi, "would have"], // Common error
     ];
     
     englishFixes.forEach(([pattern, replacement]) => {
@@ -266,6 +303,29 @@ export function polishText(text: string): { polished: string; wasPolished: boole
   }
   
   return { polished, wasPolished: hasChanges };
+}
+
+// Enhanced async polishText with OpenAI fallback for English
+export async function polishTextAsync(text: string): Promise<{ polished: string; wasPolished: boolean }> {
+  const original = text.trim();
+  if (!original) return { polished: original, wasPolished: false };
+  
+  // Try local rules first
+  const localResult = polishText(text);
+  
+  // If no changes made by local rules and text appears to be English, try OpenAI
+  if (!localResult.wasPolished && !/[а-яё\u4e00-\u9fff\u0600-\u06ff\u0590-\u05ff\u3040-\u309f\u30a0-\u30ff]/i.test(text)) {
+    try {
+      const openAIPolished = await polishWithOpenAI(text);
+      if (openAIPolished !== text) {
+        return { polished: openAIPolished, wasPolished: true };
+      }
+    } catch (error) {
+      console.log('OpenAI polishing failed, using local result');
+    }
+  }
+  
+  return localResult;
 }
 
 const questions = [

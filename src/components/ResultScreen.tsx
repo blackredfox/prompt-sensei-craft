@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PromptAnswers, polishText } from "./PromptSensei";
+import { PromptAnswers, polishText, polishTextAsync } from "./PromptSensei";
 import { PromptQualityMeter } from "./PromptQualityMeter";
 import { usePromptLibrary } from "@/hooks/usePromptLibrary";
 import { Copy, CheckCheck, RotateCcw, Lightbulb, Sparkles, ExternalLink, Info, Wand2, Loader2 } from "lucide-react";

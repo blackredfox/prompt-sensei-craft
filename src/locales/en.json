@@ -167,6 +167,7 @@
   "copy_for_claude": "Copy for Claude",
   "open_in_perplexity": "Open in Perplexity",
   "open_in_you": "Open in You.com",
+  "open_in_grok": "Open in Grok",
   "prompt_copied": "Prompt copied!",
   "ready_paste_claude": "Ready to paste in Claude.ai",
   "adaptive_feedback_manager_professional": "💼 Would you prefer to keep it more professional? That's often better for manager-level communication.",
