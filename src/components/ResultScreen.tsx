@@ -48,12 +48,13 @@ function detectPersona(question: string): string {
 async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage: string): Promise<{ prompt: string; explanation: string; polishInfo?: { original: string; polished: string }; polishAttempted?: boolean }> {
   const { question, audience, tone, format, complexity, depth, polishInput, insightMode, language } = answers;
   
-  // Polish the question if requested
+  // Polish the question - always try for English, or if explicitly requested
   let finalQuestion = question;
   let polishInfo: { original: string; polished: string } | undefined;
   let polishAttempted = false;
   
-  if (polishInput === "true") {
+  // Always attempt polish for English language, or if user explicitly requested it
+  if (currentLanguage === 'en' || polishInput === "true") {
     polishAttempted = true;
     console.log('[⚠️ Attempting to polish]', question, 'Language:', currentLanguage);
     const { polished, wasPolished } = await polishTextAsync(question, currentLanguage);

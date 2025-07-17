@@ -313,31 +313,36 @@ export function polishText(text: string): { polished: string; wasPolished: boole
 
 // Enhanced async polishText with OpenAI fallback for English
 export async function polishTextAsync(text: string, language?: string): Promise<{ polished: string; wasPolished: boolean }> {
-  console.log('[⚠️ polishTextAsync] input text:', text);
+  console.log('[⚠️ polishTextAsync] input text:', text, 'language:', language);
   const original = text.trim();
   if (!original) return { polished: original, wasPolished: false };
   
   // Try local rules first
   const localResult = polishText(text);
+  console.log('[📝 Local rules result]', localResult);
   
   // If language is English, always try OpenAI for any text that might have errors
   // This ensures grammar errors like "doo" and "wants" get corrected
   if (language === 'en') {
-    console.log('[Polish Fallback] Triggering OpenAI for English text:', text);
+    console.log('[🚀 Polish Fallback] Triggering OpenAI for English text:', text);
     try {
       const openAIPolished = await polishWithOpenAI(text);
+      console.log('[📥 OpenAI returned]', openAIPolished);
       if (openAIPolished !== text) {
-        console.log('[Polish Success] OpenAI correction applied:', openAIPolished);
+        console.log('[✅ Polish Success] OpenAI correction applied:', openAIPolished);
         return { polished: openAIPolished, wasPolished: true };
       } else {
-        console.log('[Polish Info] OpenAI returned same text (no changes needed)');
+        console.log('[ℹ️ Polish Info] OpenAI returned same text (no changes needed)');
+        // Still return the OpenAI result as it was processed, even if unchanged
+        return { polished: openAIPolished, wasPolished: false };
       }
     } catch (error) {
-      console.error('Error with OpenAI polish:', error);
+      console.error('[❌ Error with OpenAI polish]', error);
       // Fall back to local result
     }
   }
   
+  console.log('[📤 Returning local result]', localResult);
   return localResult;
 }
 
