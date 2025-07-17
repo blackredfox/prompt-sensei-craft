@@ -53,7 +53,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   let polishInfo: { original: string; polished: string } | undefined;
   
   if (polishInput === "true") {
-    const { polished, wasPolished } = await polishTextAsync(question);
+    const { polished, wasPolished } = await polishTextAsync(question, currentLanguage);
     if (wasPolished) {
       polishInfo = { original: question, polished };
       finalQuestion = polished;

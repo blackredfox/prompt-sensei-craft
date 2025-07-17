@@ -306,22 +306,24 @@ export function polishText(text: string): { polished: string; wasPolished: boole
 }
 
 // Enhanced async polishText with OpenAI fallback for English
-export async function polishTextAsync(text: string): Promise<{ polished: string; wasPolished: boolean }> {
+export async function polishTextAsync(text: string, language?: string): Promise<{ polished: string; wasPolished: boolean }> {
   const original = text.trim();
   if (!original) return { polished: original, wasPolished: false };
   
   // Try local rules first
   const localResult = polishText(text);
   
-  // If no changes made by local rules and text appears to be English, try OpenAI
-  if (!localResult.wasPolished && !/[а-яё\u4e00-\u9fff\u0600-\u06ff\u0590-\u05ff\u3040-\u309f\u30a0-\u30ff]/i.test(text)) {
+  // If no local improvements and language is English, try OpenAI
+  if (!localResult.wasPolished && language === 'en') {
+    console.log('[Polish Fallback] Triggering OpenAI for:', text);
     try {
       const openAIPolished = await polishWithOpenAI(text);
       if (openAIPolished !== text) {
         return { polished: openAIPolished, wasPolished: true };
       }
     } catch (error) {
-      console.log('OpenAI polishing failed, using local result');
+      console.error('Error with OpenAI polish:', error);
+      // Fall back to original text
     }
   }
   
