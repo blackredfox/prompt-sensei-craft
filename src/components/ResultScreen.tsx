@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +45,7 @@ function detectPersona(question: string): string {
   return "";
 }
 
-function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage: string): { prompt: string; explanation: string; polishInfo?: { original: string; polished: string } } {
+async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage: string): Promise<{ prompt: string; explanation: string; polishInfo?: { original: string; polished: string } }> {
   const { question, audience, tone, format, complexity, depth, polishInput, insightMode, language } = answers;
   
   // Polish the question if requested
@@ -53,7 +53,7 @@ function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage
   let polishInfo: { original: string; polished: string } | undefined;
   
   if (polishInput === "true") {
-    const { polished, wasPolished } = polishText(question);
+    const { polished, wasPolished } = await polishTextAsync(question);
     if (wasPolished) {
       polishInfo = { original: question, polished };
       finalQuestion = polished;
@@ -368,11 +368,21 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
   const [aiResponse, setAiResponse] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState<string>("");
+  const [explanation, setExplanation] = useState<string>("");
+  const [polishInfo, setPolishInfo] = useState<{ original: string; polished: string } | undefined>();
   const { toast } = useToast();
   const { savePrompt } = usePromptLibrary();
   const { t, i18n } = useTranslation();
   
-  const { prompt, explanation, polishInfo } = generateOptimizedPrompt(answers, t, i18n.language);
+  // Generate the optimized prompt on component mount and when answers change
+  useEffect(() => {
+    generateOptimizedPrompt(answers, t, i18n.language).then(({ prompt, explanation, polishInfo }) => {
+      setPrompt(prompt);
+      setExplanation(explanation);
+      setPolishInfo(polishInfo);
+    });
+  }, [answers, t, i18n.language]);
 
   const handleCopy = async () => {
     try {
