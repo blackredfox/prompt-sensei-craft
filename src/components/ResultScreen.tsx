@@ -164,14 +164,14 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   // Expert role prefixes by language
   const expertRolePrefixes = {
     en: "You are an expert consultant with deep knowledge in your field. ",
-    es: "Eres un consultor experto con profundo conocimiento en tu campo. ",
-    ru: "Ты эксперт с глубокими знаниями в своей области. ",
-    de: "Du bist ein erfahrener Berater mit umfassendem Fachwissen in deinem Bereich. ",
-    fr: "Vous êtes un consultant expert avec une connaissance approfondie de votre domaine. ",
-    pt: "Você é um consultor especialista com profundo conhecimento em sua área. ",
-    it: "Sei un consulente esperto con una profonda conoscenza nel tuo campo. ",
-    uk: "Ви експерт із глибокими знаннями у своїй галузі. ",
-    pl: "Jesteś ekspertem z głęboką wiedzą w swojej dziedzinie. "
+    ru: "Вы — эксперт-консультант с глубокими знаниями в своей области. ",
+    es: "Eres un consultor experto con un profundo conocimiento en tu campo. ",
+    de: "Du bist ein fachkundiger Berater mit umfassendem Wissen auf deinem Gebiet. ",
+    fr: "Vous êtes un consultant expert avec une connaissance approfondie dans votre domaine. ",
+    zh: "您是该领域具有深厚知识的专家顾问。",
+    ar: "أنت مستشار خبير ذو معرفة عميقة في مجالك. ",
+    ja: "あなたは、専門分野に深い知識を持つエキスパートコンサルタントです。",
+    he: "אתה יועץ מומחה בעל ידע מעמיק בתחום שלך. "
   };
 
   // Auto-detect persona first and add it at the beginning for Russian
@@ -338,15 +338,15 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   let expertClaritySuffix = "";
   if (expertRoleAdded) {
     const clarityStructureSuffixes = {
-      en: " Provide a structured, step-by-step explanation with examples. Respond in clear, fluent English.",
-      es: " Proporciona una explicación estructurada paso a paso con ejemplos. Responde en un español claro y fluido.",
-      ru: " Дай пошаговое объяснение с примерами. Отвечай ясно и грамотно.",
-      de: " Erkläre strukturiert und schrittweise mit Beispielen. Antworte in klarem, fließendem Deutsch.",
-      fr: " Fournissez une explication structurée, étape par étape, avec des exemples. Répondez en français clair et fluide.",
-      pt: " Forneça uma explicação estruturada, passo a passo, com exemplos. Responda em português claro e fluente.",
-      it: " Fornisci una spiegazione strutturata, passo dopo passo, con esempi. Rispondi in italiano chiaro e fluente.",
-      uk: " Надайте структуроване поетапне пояснення з прикладами. Відповідайте чіткою, грамотною українською мовою.",
-      pl: " Podaj uporządkowane, krok po kroku wyjaśnienie z przykładami. Odpowiadaj jasno i poprawną polszczyzną."
+      en: " Please provide a step-by-step response with numbered instructions. Respond in clear, fluent English.",
+      ru: " Пожалуйста, дайте пошаговый ответ с нумерованными инструкциями. Ответьте ясно и грамотно.",
+      es: " Por favor, proporciona una respuesta paso a paso con instrucciones numeradas. Responde con claridad y fluidez.",
+      de: " Bitte geben Sie eine schrittweise Antwort mit nummerierten Anweisungen. Antworten Sie klar und flüssig.",
+      fr: " Veuillez fournir une réponse étape par étape avec des instructions numérotées. Répondez clairement et avec fluidité.",
+      zh: " 请提供带编号的分步骤回答。用清晰、流利的语言作答。",
+      ar: " يرجى تقديم إجابة خطوة بخطوة مع تعليمات مرقمة. أجب بلغة واضحة وطليقة.",
+      ja: " 番号付きのステップバイステップの回答を提供してください。明確で流暢な日本語で答えてください。",
+      he: " אנא ספק תגובה שלב אחר שלב עם הוראות ממוספרות. השב בעברית ברורה ורהוטה."
     };
     
     expertClaritySuffix = clarityStructureSuffixes[currentLanguage as keyof typeof clarityStructureSuffixes] || clarityStructureSuffixes.en;
