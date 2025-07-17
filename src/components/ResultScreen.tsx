@@ -174,6 +174,9 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
     he: "אתה יועץ מומחה בעל ידע מעמיק בתחום שלך. "
   };
 
+  // Check if this is a beginner-friendly prompt
+  const isBeginnerPrompt = tone === "I'm new" || tone === "beginner";
+  
   // Auto-detect persona first and add it at the beginning for Russian
   const detectedPersona = detectPersona(finalQuestion);
   let hasPersona = false;
@@ -182,8 +185,8 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   if (detectedPersona && complexity === "optimize") {
     prompt += detectedPersona;
     hasPersona = true;
-  } else if (shouldAddExpertRole && complexity === "optimize") {
-    // Add expert role enrichment
+  } else if (shouldAddExpertRole && complexity === "optimize" && !isBeginnerPrompt) {
+    // Add expert role enrichment (but not for beginner prompts)
     const expertPrefix = expertRolePrefixes[currentLanguage as keyof typeof expertRolePrefixes] || expertRolePrefixes.en;
     prompt += expertPrefix;
     hasPersona = true;
@@ -334,8 +337,9 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
     }
   }
 
-  // Add clarity and structure suffix for expert role enrichment
+  // Add clarity and structure suffix for expert role enrichment or beginner-friendly prompts
   let expertClaritySuffix = "";
+  
   if (expertRoleAdded) {
     const clarityStructureSuffixes = {
       en: " Please provide a step-by-step response with numbered instructions. Respond in clear, fluent English.",
@@ -350,6 +354,21 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
     };
     
     expertClaritySuffix = clarityStructureSuffixes[currentLanguage as keyof typeof clarityStructureSuffixes] || clarityStructureSuffixes.en;
+  } else if (isBeginnerPrompt && polishInput === "true") {
+    // Add beginner-friendly clarity suffix when polish is enabled but no expert role is added
+    const newbieFriendlySuffixes = {
+      en: " Please explain this in a clear and beginner-friendly way. Avoid oversimplification.",
+      ru: " Поясните это ясно и доступно для новичков. Избегайте чрезмерных упрощений.",
+      es: " Explique esto de manera clara y fácil para principiantes. Evite simplificaciones excesivas.",
+      de: " Erklären Sie dies klar und anfängerfreundlich. Vermeiden Sie zu starke Vereinfachung.",
+      fr: " Expliquez cela de manière claire et accessible aux débutants. Évitez les simplifications excessives.",
+      zh: " 请用清晰、适合初学者的方式解释。避免过度简化。",
+      ar: " يرجى الشرح بطريقة واضحة وسهلة للمبتدئين. تجنب التبسيط الزائد.",
+      ja: " 初心者にもわかるように、わかりやすく説明してください。過度な単純化は避けてください。",
+      he: " אנא הסבר בצורה ברורה ופשוטה למתחילים. הימנע מפישוט יתר."
+    };
+    
+    expertClaritySuffix = newbieFriendlySuffixes[currentLanguage as keyof typeof newbieFriendlySuffixes] || newbieFriendlySuffixes.en;
   }
 
   // Add language preference with enhanced instructions for all languages

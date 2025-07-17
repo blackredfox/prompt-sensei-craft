@@ -64,6 +64,9 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
     suggestions.push(t('adaptive_feedback_length'));
   }
 
+  // Check if this is a beginner-friendly prompt
+  const isBeginnerPrompt = answers.tone === "I'm new" || answers.tone === "beginner";
+
   // 2. Persona/Role presence (0-2 points) - Language-aware
   const personaPatterns = isNonEnglish ? [
     // Russian
@@ -88,7 +91,8 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
   if (hasPersona) {
     breakdown.persona = 2;
     score += 2;
-  } else if (answers.complexity === "optimize") {
+  } else if (answers.complexity === "optimize" && !isBeginnerPrompt) {
+    // Don't penalize beginner prompts for lack of persona
     suggestions.push(t('adaptive_feedback_persona'));
   }
 
@@ -168,11 +172,34 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
     /קהל|לקוח|מנהל|בוס/i
   ] : [/audience|client|manager/i];
   
+  // Check for beginner-friendly clarity suffixes
+  const beginnerClarityPatterns = isNonEnglish ? [
+    // Russian
+    /доступно для новичков|избегайте чрезмерных упрощений|ясно и доступно/i,
+    // Spanish
+    /fácil para principiantes|evite simplificaciones excesivas|clara y fácil/i,
+    // French
+    /accessible aux débutants|évitez les simplifications excessives|claire et accessible/i,
+    // German
+    /anfängerfreundlich|vermeiden Sie zu starke Vereinfachung|klar und anfängerfreundlich/i,
+    // Chinese
+    /适合初学者|避免过度简化|清晰.*适合初学者/i,
+    // Arabic
+    /سهلة للمبتدئين|تجنب التبسيط الزائد|واضحة وسهلة/i,
+    // Japanese
+    /初心者.*わかる|過度な単純化は避け|わかりやすく/i,
+    // Hebrew
+    /פשוטה למתחילים|הימנע מפישוט יתר|ברורה ופשוטה/i
+  ] : [/beginner-friendly|avoid oversimplification|clear and beginner/i];
+  
+  const hasBeginnerClarity = beginnerClarityPatterns.some(pattern => pattern.test(prompt));
   const hasContext = contextPatterns.some(pattern => pattern.test(prompt)) || answers.depth === "deep";
+  
   if (hasContext) {
     breakdown.structure = 2;
     score += 2;
-  } else if (answers.complexity === "simple") {
+  } else if (answers.complexity === "simple" || (isBeginnerPrompt && hasBeginnerClarity)) {
+    // Give credit for beginner prompts with clarity suffixes
     breakdown.structure = 1;
     score += 1;
   } else {
@@ -276,8 +303,22 @@ export function PromptQualityMeter({ prompt, answers }: PromptQualityMeterProps)
           </div>
         </div>
 
+        {/* Dynamic tip for beginner prompts */}
+        {result.score < 7 && (answers.tone === "I'm new" || answers.tone === "beginner") && (
+          <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-start gap-2">
+              <Lightbulb className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  <strong>💡 Tip:</strong> You selected a simplified prompt style. For deeper results, try enabling 'Deep Insight' or setting a professional tone.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Suggestions for improvement */}
-        {result.suggestions.length > 0 && result.score < 8 && (
+        {result.suggestions.length > 0 && result.score < 8 && !(answers.tone === "I'm new" || answers.tone === "beginner") && (
           <div className="mt-4 p-3 rounded-lg bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800">
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
