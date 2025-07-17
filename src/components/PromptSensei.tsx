@@ -79,6 +79,17 @@ export function polishText(text: string): { polished: string; wasPolished: boole
       [/\bзачем\s+мне\b/gi, "зачем мне"], // Ensure proper spacing
       [/\bкак\s+дела\b/gi, "как дела"], // Common phrase
       [/\bпридумл\b/gi, "придумал"], // Common typo: "придумл" → "придумал"
+      [/\bкто ест\b/gi, "кто ест"], // Grammar: "who eat" equivalent  
+      [/\bкто едят\b/gi, "кто ест"], // Grammar fix: plural verb with singular pronoun
+      [/\bсобк\b/gi, "собак"], // Common typo: "dgs" equivalent
+      [/\bглобус\?\?/gi, "глобус?"], // Fix double question marks
+      [/\bсоздать\s+подсказки\b/gi, "создать подсказки"], // Create prompts
+      [/\bработать\s+с\s+ИИ\b/gi, "работать с ИИ"], // Work with AI
+      [/\bпомочь\s+мне\b/gi, "помочь мне"], // Help me
+      [/\bкак\s+можно\b/gi, "как можно"], // How can
+      [/\bделать\s+лучше\b/gi, "сделать лучше"], // Make better
+      [/([а-яё])\s*\?\s*\?/gi, '$1?'], // Remove double question marks
+      [/([а-яё])\s*\.\s*\./gi, '$1.'], // Remove double periods
     ];
     
     russianFixes.forEach(([pattern, replacement]) => {

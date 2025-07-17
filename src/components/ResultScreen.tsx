@@ -146,7 +146,7 @@ function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage
   // Get localized strings or fall back to English
   const currentLocalizedPrompts = localizedPrompts[currentLanguage as keyof typeof localizedPrompts];
 
-  // Auto-detect persona first
+  // Auto-detect persona first and add it at the beginning for Russian
   const detectedPersona = detectPersona(finalQuestion);
   let hasPersona = false;
   
@@ -178,10 +178,19 @@ function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage
     }
   }
 
-  // Add the main question
-  prompt += finalQuestion.trim();
-  if (!finalQuestion.trim().endsWith("?") && !finalQuestion.trim().endsWith(".")) {
-    prompt += ".";
+  // Add the main question - for Russian, improve structure
+  if (currentLanguage === 'ru') {
+    // For Russian, ensure proper sentence order: persona first, then question
+    prompt += finalQuestion.trim();
+    if (!finalQuestion.trim().endsWith("?") && !finalQuestion.trim().endsWith(".")) {
+      prompt += ".";
+    }
+  } else {
+    // For other languages, keep existing structure
+    prompt += finalQuestion.trim();
+    if (!finalQuestion.trim().endsWith("?") && !finalQuestion.trim().endsWith(".")) {
+      prompt += ".";
+    }
   }
 
   // Add audience context with localization

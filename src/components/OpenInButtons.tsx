@@ -18,6 +18,7 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
       gemini: `https://gemini.google.com/app?q=${encoded}`,
       perplexity: `https://www.perplexity.ai/search?q=${encoded}`,
       you: `https://you.com/search?q=${encoded}`,
+      grok: `https://grok.com/?referrer=website`,
     };
     
     if (urls[platform]) {
@@ -89,6 +90,14 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
         >
           <Globe className="w-4 h-4 mr-2" />
           {t('open_in_you')}
+        </Button>
+        
+        <Button
+          onClick={() => openIn("grok")}
+          className="bg-violet-600 hover:bg-violet-700 text-white font-medium"
+        >
+          <Brain className="w-4 h-4 mr-2" />
+          {t('open_in_grok')}
         </Button>
       </div>
     </div>
