@@ -179,5 +179,10 @@
   "specificity": "Especificidad",
   "ways_to_improve": "Formas de mejorar tu prompt",
   "excellent_prompt": "Excelente prompt",
-  "excellent_prompt_desc": "Esto debería generar respuestas de alta calidad y específicas de cualquier asistente de IA."
+  "excellent_prompt_desc": "Esto debería generar respuestas de alta calidad y específicas de cualquier asistente de IA.",
+  "adaptive_feedback_length": "Trata de ser más específico sobre tu objetivo o requisitos",
+  "adaptive_feedback_persona": "Habilita 'Hacerlo más inteligente' para la detección automática de roles de experto",
+  "adaptive_feedback_format": "Agrega especificación de formato como puntos o paso a paso",
+  "adaptive_feedback_specificity": "Agrega solicitudes específicas como 'incluye ejemplos' o 'explica cómo'",
+  "adaptive_feedback_context": "Considera especificar tu audiencia o habilitar el modo DeepSearch"
 }

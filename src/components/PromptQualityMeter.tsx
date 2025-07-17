@@ -30,7 +30,7 @@ interface ScoreResult {
   };
 }
 
-function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]): ScoreResult {
+function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"], t: any): ScoreResult {
   let score = 0;
   const suggestions: string[] = [];
   const breakdown = {
@@ -61,7 +61,7 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
     breakdown.length = 2;
     score += 1;
   } else if (prompt.length <= 50) {
-    suggestions.push("Try being more specific about your goal or requirements");
+    suggestions.push(t('adaptive_feedback_length'));
   }
 
   // 2. Persona/Role presence (0-2 points) - Language-aware
@@ -89,7 +89,7 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
     breakdown.persona = 2;
     score += 2;
   } else if (answers.complexity === "optimize") {
-    suggestions.push("Enable 'Make it smarter' for automatic expert role detection");
+    suggestions.push(t('adaptive_feedback_persona'));
   }
 
   // 3. Format specification (0-2 points) - Language-aware
@@ -117,7 +117,7 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
     breakdown.format = 2;
     score += 2;
   } else {
-    suggestions.push("Add format specification like bullet points or step-by-step");
+    suggestions.push(t('adaptive_feedback_format'));
   }
 
   // 4. Specificity (0-2 points) - Language-aware
@@ -145,7 +145,7 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
     breakdown.specificity = 2;
     score += 2;
   } else {
-    suggestions.push("Add specific requests like 'include examples' or 'explain how'");
+    suggestions.push(t('adaptive_feedback_specificity'));
   }
 
   // 5. Structure and context (0-2 points) - Language-aware
@@ -176,7 +176,7 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
     breakdown.structure = 1;
     score += 1;
   } else {
-    suggestions.push("Consider specifying your audience or enabling DeepSearch mode");
+    suggestions.push(t('adaptive_feedback_context'));
   }
 
   // Grammar and polish bonus
@@ -195,7 +195,7 @@ function scorePrompt(prompt: string, answers: PromptQualityMeterProps["answers"]
 
 export function PromptQualityMeter({ prompt, answers }: PromptQualityMeterProps) {
   const { t } = useTranslation();
-  const result = scorePrompt(prompt, answers);
+  const result = scorePrompt(prompt, answers, t);
   
   const getColorClass = (tier: string) => {
     switch (tier) {

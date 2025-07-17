@@ -148,12 +148,16 @@ function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage
 
   // Auto-detect persona first
   const detectedPersona = detectPersona(finalQuestion);
+  let hasPersona = false;
+  
   if (detectedPersona && complexity === "optimize") {
     prompt += detectedPersona;
+    hasPersona = true;
   } else if (complexity === "optimize") {
     // Use localized persona or fallback to English
     if (currentLocalizedPrompts?.persona[tone as keyof typeof currentLocalizedPrompts.persona]) {
       prompt += currentLocalizedPrompts.persona[tone as keyof typeof currentLocalizedPrompts.persona];
+      hasPersona = true;
     } else {
       // Fallback to English
       switch (tone) {
@@ -170,6 +174,7 @@ function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage
           prompt += "You are a concise assistant who gets straight to the point. ";
           break;
       }
+      hasPersona = true;
     }
   }
 

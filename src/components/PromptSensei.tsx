@@ -197,8 +197,8 @@ export function polishText(text: string): { polished: string; wasPolished: boole
         polished = newText;
       }
     });
-  } else if (!isLikelyNonEnglish(polished)) {
-    // English grammar fixes
+  } else {
+    // English grammar fixes (apply to all text that doesn't match non-English patterns)
     const englishFixes: [RegExp, string][] = [
       [/\bi\b/g, 'I'], // Lowercase 'i' to 'I'
       [/\bim\b/gi, "I'm"], // 'im' to "I'm"
@@ -210,8 +210,10 @@ export function polishText(text: string): { polished: string; wasPolished: boole
       [/\bsaj\b/gi, "say"], // Common typo
       [/\bto do not\b/gi, "not to"], // Grammar fix
       [/\bwho eat dgs\b/gi, "who eats dogs"], // Example from the user
+      [/\bdgs\b/gi, "dogs"], // Fix "dgs" typo
       [/\bhow can i\b/gi, "How can I"], // Capitalize start
       [/\bwow can i\b/gi, "How can I"], // Common start typo
+      [/\bwho eat\b/gi, "who eats"], // Fix grammar "who eat" -> "who eats"
     ];
     
     englishFixes.forEach(([pattern, replacement]) => {

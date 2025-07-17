@@ -210,7 +210,12 @@
   "format_steps": "step-by-step format",
   "format_paragraph": "paragraph format",
   "tone_friendly": "friendly",
-  "tone_expert": "expert",
+  "tone_expert": "expert", 
   "tone_short": "short",
-  "tone_creative": "creative"
+  "tone_creative": "creative",
+  "adaptive_feedback_length": "Try being more specific about your goal or requirements",
+  "adaptive_feedback_persona": "Enable 'Make it smarter' for automatic expert role detection",
+  "adaptive_feedback_format": "Add format specification like bullet points or step-by-step",
+  "adaptive_feedback_specificity": "Add specific requests like 'include examples' or 'explain how'",
+  "adaptive_feedback_context": "Consider specifying your audience or enabling DeepSearch mode"
 }
