@@ -218,5 +218,7 @@
   "adaptive_feedback_persona": "Enable 'Make it smarter' for automatic expert role detection",
   "adaptive_feedback_format": "Add format specification like bullet points or step-by-step",
   "adaptive_feedback_specificity": "Add specific requests like 'include examples' or 'explain how'",
-  "adaptive_feedback_context": "Consider specifying your audience or enabling DeepSearch mode"
+  "adaptive_feedback_context": "Consider specifying your audience or enabling DeepSearch mode",
+  "beginner_tip_title": "💡 Tip for Beginners",
+  "beginner_tip_body": "You're using beginner-friendly settings. For even better results, try enabling 'Deep Insight' or choosing a professional tone."
 }

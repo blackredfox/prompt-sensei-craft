@@ -184,5 +184,7 @@
   "adaptive_feedback_persona": "Habilita 'Hacerlo más inteligente' para la detección automática de roles de experto",
   "adaptive_feedback_format": "Agrega especificación de formato como puntos o paso a paso",
   "adaptive_feedback_specificity": "Agrega solicitudes específicas como 'incluye ejemplos' o 'explica cómo'",
-  "adaptive_feedback_context": "Considera especificar tu audiencia o habilitar el modo DeepSearch"
+  "adaptive_feedback_context": "Considera especificar tu audiencia o habilitar el modo DeepSearch",
+  "beginner_tip_title": "💡 Consejo para principiantes",
+  "beginner_tip_body": "Estás usando configuraciones para principiantes. Para obtener mejores resultados, prueba habilitar 'Análisis profundo' o elegir un tono profesional."
 }

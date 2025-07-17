@@ -179,5 +179,7 @@
   "specificity": "Spezifität",
   "ways_to_improve": "Wege zur Verbesserung deines Prompts",
   "excellent_prompt": "Exzellenter Prompt",
-  "excellent_prompt_desc": "Dies sollte hochwertige, zielgerichtete Antworten von jedem KI-Assistenten generieren."
+  "excellent_prompt_desc": "Dies sollte hochwertige, zielgerichtete Antworten von jedem KI-Assistenten generieren.",
+  "beginner_tip_title": "💡 Tipp für Anfänger",
+  "beginner_tip_body": "Sie verwenden anfängerfreundliche Einstellungen. Für noch bessere Ergebnisse versuchen Sie 'Tiefe Analyse' zu aktivieren oder einen professionellen Ton zu wählen."
 }

@@ -179,5 +179,7 @@
   "specificity": "ספציפיות",
   "ways_to_improve": "דרכים לשפר את הפרומפט שלך",
   "excellent_prompt": "פרומפט מעולה",
-  "excellent_prompt_desc": "זה אמור לייצר תגובות איכותיות וממוקדות מכל עוזר AI."
+  "excellent_prompt_desc": "זה אמור לייצר תגובות איכותיות וממוקדות מכל עוזר AI.",
+  "beginner_tip_title": "💡 טיפ למתחילים",
+  "beginner_tip_body": "אתה משתמש בהגדרות ידידותיות למתחילים. לתוצאות טובות יותר, נסה להפעיל 'תובנה עמוקה' או לבחור טון מקצועי."
 }

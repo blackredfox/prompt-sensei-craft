@@ -179,5 +179,7 @@
   "specificity": "具体性",
   "ways_to_improve": "改善你的提示的方法",
   "excellent_prompt": "优秀的提示",
-  "excellent_prompt_desc": "这应该能从任何AI助手那里产生高质量、有针对性的回答。"
+  "excellent_prompt_desc": "这应该能从任何AI助手那里产生高质量、有针对性的回答。",
+  "beginner_tip_title": "💡 新手提示",
+  "beginner_tip_body": "您正在使用新手友好的设置。为了获得更好的结果，请尝试启用"深度洞察"或选择专业语调。"
 }

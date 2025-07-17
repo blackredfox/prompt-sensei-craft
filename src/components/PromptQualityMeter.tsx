@@ -283,6 +283,23 @@ export function PromptQualityMeter({ prompt, answers }: PromptQualityMeterProps)
           </div>
         </div>
 
+        {/* Beginner tip - positioned above breakdown for better visibility */}
+        {result.score <= 7 && (answers.tone === "I'm new" || answers.tone === "beginner") && (
+          <div className="mt-6 p-4 rounded-lg bg-blue-100 dark:bg-blue-950/30 border-2 border-blue-500/40 dark:border-blue-400/40">
+            <div className="flex items-start gap-3">
+              <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-1">
+                  {t('beginner_tip_title')}
+                </h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  {t('beginner_tip_body')}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Breakdown */}
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex justify-between">
@@ -302,20 +319,6 @@ export function PromptQualityMeter({ prompt, answers }: PromptQualityMeterProps)
             <span className="font-medium">{result.breakdown.specificity}/2</span>
           </div>
         </div>
-
-        {/* Dynamic tip for beginner prompts */}
-        {result.score < 7 && (answers.tone === "I'm new" || answers.tone === "beginner") && (
-          <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
-            <div className="flex items-start gap-2">
-              <Lightbulb className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  <strong>💡 Tip:</strong> You selected a simplified prompt style. For deeper results, try enabling 'Deep Insight' or setting a professional tone.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Suggestions for improvement */}
         {result.suggestions.length > 0 && result.score < 8 && !(answers.tone === "I'm new" || answers.tone === "beginner") && (

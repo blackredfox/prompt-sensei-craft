@@ -179,5 +179,7 @@
   "specificity": "Spécificité",
   "ways_to_improve": "Moyens d'améliorer ton prompt",
   "excellent_prompt": "Excellent prompt",
-  "excellent_prompt_desc": "Ceci devrait générer des réponses de haute qualité et ciblées de tout assistant IA."
+  "excellent_prompt_desc": "Ceci devrait générer des réponses de haute qualité et ciblées de tout assistant IA.",
+  "beginner_tip_title": "💡 Conseil pour débutants",
+  "beginner_tip_body": "Vous utilisez des paramètres adaptés aux débutants. Pour de meilleurs résultats, essayez d'activer 'Analyse approfondie' ou de choisir un ton professionnel."
 }

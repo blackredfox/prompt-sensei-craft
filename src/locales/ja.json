@@ -179,5 +179,7 @@
   "specificity": "具体性",
   "ways_to_improve": "プロンプトを改善する方法",
   "excellent_prompt": "優秀なプロンプト",
-  "excellent_prompt_desc": "これは、どのAIアシスタントからも高品質で的確な回答を生成するはずです。"
+  "excellent_prompt_desc": "これは、どのAIアシスタントからも高品質で的確な回答を生成するはずです。",
+  "beginner_tip_title": "💡 初心者向けのヒント",
+  "beginner_tip_body": "初心者向けの設定を使用しています。より良い結果を得るには、「深い洞察」を有効にするか、プロフェッショナルなトーンを選択してみてください。"
 }
