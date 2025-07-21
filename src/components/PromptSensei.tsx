@@ -16,8 +16,10 @@ export interface PromptAnswers {
   targetAudience: string;
   tone: 'friendly' | 'expert' | 'creative' | 'short';
   format: 'bullet' | 'step' | 'paragraph';
-  depth: 'simple' | 'deep';
-  autoEnhance: boolean;
+  enhancementLevel: 'smart' | 'clear';
+  deepSearch: boolean;
+  polishInput: boolean;
+  deepInsight: boolean;
   language: string;
 }
 
@@ -384,19 +386,59 @@ const questions = [
     ]
   },
   {
-    id: "formatAndDepth",
-    title: "response_format",
-    subtitle: "how_should_response_look",
-    type: "combined" as const,
-    tooltip: "format_depth_tooltip",
-    formatOptions: [
+    id: "format",
+    title: "what_format_best",
+    subtitle: "select_output_structure",
+    type: "select" as const,
+    tooltip: "format_tooltip",
+    options: [
       { value: "bullet", label: "bullet_list", description: "bullet_desc" },
       { value: "step", label: "step_by_step", description: "steps_desc" },
       { value: "paragraph", label: "paragraph", description: "paragraph_desc" }
-    ],
-    depthOptions: [
-      { value: "simple", label: "simple", description: "simple_response_desc" },
-      { value: "deep", label: "deep_insight", description: "deep_insight_desc" }
+    ]
+  },
+  {
+    id: "enhancementLevel",
+    title: "how_smart_prompt",
+    subtitle: "select_ai_enhancement_level",
+    type: "select" as const,
+    tooltip: "enhancement_tooltip",
+    options: [
+      { value: "smart", label: "make_it_smarter", description: "smart_desc" },
+      { value: "clear", label: "keep_it_clear", description: "clear_desc" }
+    ]
+  },
+  {
+    id: "deepSearch",
+    title: "would_like_ai_deeper",
+    subtitle: "choose_ai_analysis_depth",
+    type: "select" as const,
+    tooltip: "deep_search_tooltip",
+    options: [
+      { value: "true", label: "deep_search", description: "deep_search_desc" },
+      { value: "false", label: "keep_it_simple", description: "simple_desc" }
+    ]
+  },
+  {
+    id: "polishInput",
+    title: "polish_input_auto",
+    subtitle: "choose_grammar_clarity",
+    type: "select" as const,
+    tooltip: "polish_tooltip",
+    options: [
+      { value: "true", label: "polish_it", description: "polish_desc" },
+      { value: "false", label: "keep_as_is", description: "keep_as_is_desc" }
+    ]
+  },
+  {
+    id: "deepInsight",
+    title: "deeper_reasoning_answer",
+    subtitle: "choose_analytical_depth",
+    type: "select" as const,
+    tooltip: "deep_insight_tooltip",
+    options: [
+      { value: "true", label: "deep_insight", description: "deep_insight_desc" },
+      { value: "false", label: "just_answer", description: "just_answer_desc" }
     ]
   },
   {
@@ -419,7 +461,7 @@ const questions = [
 ];
 
 export function PromptSensei() {
-  const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1-6 = questions, 7 = result
+  const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1-9 = questions, 10 = result
   const [answers, setAnswers] = useState<Partial<PromptAnswers>>({});
   const { user, signOut, loading } = useAuth();
   const { t, i18n } = useTranslation();
@@ -436,14 +478,16 @@ export function PromptSensei() {
     } else if (currentStep === 3) {
       setAnswers(prev => ({ ...prev, tone: answer as PromptAnswers['tone'] }));
     } else if (currentStep === 4) {
-      // Handle combined format and depth
-      const [format, depth] = answer.split(',');
-      setAnswers(prev => ({ 
-        ...prev, 
-        format: (format || prev.format) as PromptAnswers['format'],
-        depth: (depth || prev.depth) as PromptAnswers['depth']
-      }));
+      setAnswers(prev => ({ ...prev, format: answer as PromptAnswers['format'] }));
     } else if (currentStep === 5) {
+      setAnswers(prev => ({ ...prev, enhancementLevel: answer as PromptAnswers['enhancementLevel'] }));
+    } else if (currentStep === 6) {
+      setAnswers(prev => ({ ...prev, deepSearch: answer === 'true' }));
+    } else if (currentStep === 7) {
+      setAnswers(prev => ({ ...prev, polishInput: answer === 'true' }));
+    } else if (currentStep === 8) {
+      setAnswers(prev => ({ ...prev, deepInsight: answer === 'true' }));
+    } else if (currentStep === 9) {
       setAnswers(prev => ({ ...prev, language: answer }));
     }
   };
@@ -452,8 +496,12 @@ export function PromptSensei() {
     if (currentStep === 1) return answers.questionRaw || '';
     if (currentStep === 2) return answers.targetAudience || '';
     if (currentStep === 3) return answers.tone || '';
-    if (currentStep === 4) return `${answers.format || ''},${answers.depth || ''}`;
-    if (currentStep === 5) return answers.language || '';
+    if (currentStep === 4) return answers.format || '';
+    if (currentStep === 5) return answers.enhancementLevel || '';
+    if (currentStep === 6) return answers.deepSearch ? 'true' : 'false';
+    if (currentStep === 7) return answers.polishInput ? 'true' : 'false';
+    if (currentStep === 8) return answers.deepInsight ? 'true' : 'false';
+    if (currentStep === 9) return answers.language || '';
     return '';
   };
 

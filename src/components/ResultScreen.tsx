@@ -46,7 +46,7 @@ function detectPersona(question: string): string {
 }
 
 async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage: string): Promise<{ prompt: string; explanation: string; polishInfo?: { original: string; polished: string }; polishAttempted?: boolean }> {
-  const { questionRaw, targetAudience, tone, format, depth, autoEnhance, language } = answers;
+  const { questionRaw, targetAudience, tone, format, enhancementLevel, deepSearch, polishInput, deepInsight, language } = answers;
   
   // Polish the question - always try for English, or if explicitly requested
   let finalQuestion = questionRaw;
@@ -54,7 +54,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   let polishAttempted = false;
   
   // Always attempt polish for English language, or if user explicitly requested it
-  if (currentLanguage === 'en' || autoEnhance) {
+  if (currentLanguage === 'en' || polishInput) {
     polishAttempted = true;
     console.log('[⚠️ Attempting to polish]', questionRaw, 'Language:', currentLanguage);
     const { polished, wasPolished } = await polishTextAsync(questionRaw, currentLanguage);
@@ -155,7 +155,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
 
   // Expert role enrichment for expert tone with deep insight/analysis needs
   const shouldAddExpertRole = tone === "expert" && 
-    depth === "deep" &&
+    deepInsight &&
     !finalQuestion.toLowerCase().includes("expert") && 
     !finalQuestion.toLowerCase().includes("консультант") &&
     !finalQuestion.toLowerCase().includes("experto") &&
@@ -182,16 +182,16 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   let hasPersona = false;
   let expertRoleAdded = false;
   
-  if (detectedPersona && autoEnhance) {
+  if (detectedPersona && enhancementLevel === 'smart') {
     prompt += detectedPersona;
     hasPersona = true;
-  } else if (shouldAddExpertRole && autoEnhance && !isBeginnerPrompt) {
+  } else if (shouldAddExpertRole && enhancementLevel === 'smart' && !isBeginnerPrompt) {
     // Add expert role enrichment (but not for beginner prompts)
     const expertPrefix = expertRolePrefixes[currentLanguage as keyof typeof expertRolePrefixes] || expertRolePrefixes.en;
     prompt += expertPrefix;
     hasPersona = true;
     expertRoleAdded = true;
-  } else if (autoEnhance) {
+  } else if (enhancementLevel === 'smart') {
     // Use localized persona or fallback to English
     if (currentLocalizedPrompts?.persona[tone as keyof typeof currentLocalizedPrompts.persona]) {
       prompt += currentLocalizedPrompts.persona[tone as keyof typeof currentLocalizedPrompts.persona];
@@ -232,7 +232,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   }
 
   // Add audience context with localization
-  if (autoEnhance) {
+  if (enhancementLevel === 'smart') {
     if (currentLocalizedPrompts?.audience[targetAudience as keyof typeof currentLocalizedPrompts.audience]) {
       prompt += currentLocalizedPrompts.audience[targetAudience as keyof typeof currentLocalizedPrompts.audience];
     } else {
@@ -280,7 +280,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   }
 
   // Add tone refinements with localization
-  if (autoEnhance) {
+  if (enhancementLevel === 'smart') {
     if (currentLocalizedPrompts?.tone[tone as keyof typeof currentLocalizedPrompts.tone]) {
       prompt += currentLocalizedPrompts.tone[tone as keyof typeof currentLocalizedPrompts.tone];
     } else {
@@ -303,7 +303,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   }
 
   // Add DeepSearch modifier (localized)
-  if (depth === "deep") {
+  if (deepSearch) {
     if (currentLanguage === 'ru') {
       if (targetAudience === "code") {
         prompt += " Включите крайние случаи, соображения производительности и лучшие практики, если применимо. Проанализируйте тему широко и предоставьте подробные объяснения.";
@@ -344,7 +344,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
     };
     
     expertClaritySuffix = clarityStructureSuffixes[currentLanguage as keyof typeof clarityStructureSuffixes] || clarityStructureSuffixes.en;
-  } else if (isBeginnerPrompt && autoEnhance) {
+  } else if (isBeginnerPrompt && enhancementLevel === 'smart') {
     // Add beginner-friendly clarity suffix when polish is enabled but no expert role is added
     const newbieFriendlySuffixes = {
       en: " Please explain this in a clear and beginner-friendly way. Avoid oversimplification.",
@@ -394,25 +394,25 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   // Generate explanation in the UI language using translation keys
   explanation = t('why_prompt_works') + `:\n\n`;
   
-  if (detectedPersona && autoEnhance) {
+  if (detectedPersona && enhancementLevel === 'smart') {
     explanation += `• **${t('smart_persona_detection')}**: ${t('smart_persona_detection_desc')}\n\n`;
-  } else if (autoEnhance) {
+  } else if (enhancementLevel === 'smart') {
     explanation += `• **${t('role_definition')}**: ${t('role_definition_desc', { tone })}\n\n`;
   }
   
   explanation += `• **${t('clear_intent')}**: ${t('clear_intent_desc')}\n\n`;
   
-  if (autoEnhance) {
+  if (enhancementLevel === 'smart') {
     explanation += `• **${t('audience_context')}**: ${t('audience_context_desc', { audience: t(`audience_${targetAudience}`) })}\n\n`;
   }
   
   explanation += `• **${t('format_specification')}**: ${t('format_specification_desc', { format: t(`format_${format}`) })}\n\n`;
   
-  if (autoEnhance) {
+  if (enhancementLevel === 'smart') {
     explanation += `• **${t('tone_guidance')}**: ${t('tone_guidance_desc', { tone: t(`tone_${tone}`) })}\n\n`;
   }
 
-  if (depth === "deep") {
+  if (deepSearch) {
     explanation += `• **${t('deepsearch_mode')}**: ${t('deepsearch_mode_desc')}\n\n`;
   }
 
@@ -619,9 +619,9 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
             audience: answers.targetAudience,
             tone: answers.tone,
             format: answers.format,
-            complexity: answers.autoEnhance ? 'optimize' : 'simple',
-            depth: answers.depth,
-            polishInput: answers.autoEnhance ? 'true' : 'false',
+            complexity: answers.enhancementLevel === 'smart' ? 'optimize' : 'simple',
+            depth: answers.deepInsight ? 'deep' : 'simple',
+            polishInput: answers.polishInput ? 'true' : 'false',
             language: answers.language
           }} />
 
