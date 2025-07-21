@@ -8,10 +8,30 @@ interface Question {
   id: string;
   title: string;
   subtitle: string;
-  type: "textarea" | "select";
+  type: "textarea" | "select" | "combined";
   placeholder?: string;
   tooltip?: string;
   options?: {
+    value: string;
+    label: string;
+    description: string;
+  }[];
+  audienceOptions?: {
+    value: string;
+    label: string;
+    description: string;
+  }[];
+  toneOptions?: {
+    value: string;
+    label: string;
+    description: string;
+  }[];
+  formatOptions?: {
+    value: string;
+    label: string;
+    description: string;
+  }[];
+  depthOptions?: {
     value: string;
     label: string;
     description: string;
@@ -40,7 +60,19 @@ export function QuestionStep({
   allAnswers = {}
 }: QuestionStepProps) {
   const { t } = useTranslation();
-  const canProceed = answer.trim().length > 0;
+  
+  // Enhanced canProceed logic for combined fields
+  const canProceed = (() => {
+    if (question.type === "combined") {
+      if (question.id === "audienceAndTone") {
+        return allAnswers?.targetAudience && allAnswers?.tone;
+      }
+      if (question.id === "formatAndDepth") {
+        return allAnswers?.format && allAnswers?.depth;
+      }
+    }
+    return answer.trim().length > 0;
+  })();
 
   // Adaptive feedback logic
   const getAdaptiveFeedback = () => {
@@ -79,7 +111,7 @@ export function QuestionStep({
               <Textarea
                 value={answer}
                 onChange={(e) => onAnswer(e.target.value)}
-                placeholder={t(question.placeholder)}
+                placeholder={question.placeholder ? t(question.placeholder) : ""}
                 className="min-h-32 resize-none border-border/50 bg-background/50 focus:border-primary focus:ring-primary text-lg"
               />
               {question.tooltip && (
@@ -93,6 +125,182 @@ export function QuestionStep({
               <p className="text-sm text-muted-foreground mt-2">
                 {t('detailed_for_better_results')}
               </p>
+            </div>
+          ) : question.type === "combined" ? (
+            <div className="space-y-6">
+              {/* Audience Selection */}
+              {question.audienceOptions && (
+                <div>
+                  <h4 className="font-semibold text-foreground mb-3">{t('who_answer_for')}</h4>
+                  <div className="grid gap-3">
+                    {question.audienceOptions.map((option) => {
+                      const audienceValue = allAnswers?.targetAudience;
+                      return (
+                        <Card
+                          key={option.value}
+                          className={`cursor-pointer transition-all duration-200 border-2 hover:shadow-glow-secondary ${
+                            audienceValue === option.value 
+                              ? 'border-primary bg-primary/10 shadow-glow-primary' 
+                              : 'border-border/50 hover:border-primary/50'
+                          }`}
+                          onClick={() => onAnswer(`${option.value},${allAnswers?.tone || ''}`)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-foreground mb-1">
+                                  {t(option.label)}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {t(option.description)}
+                                </p>
+                              </div>
+                              {audienceValue === option.value && (
+                                <div className="p-1 rounded-full bg-gradient-primary">
+                                  <Check className="w-4 h-4 text-primary-foreground" />
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Tone Selection */}
+              {question.toneOptions && (
+                <div>
+                  <h4 className="font-semibold text-foreground mb-3">{t('tone_style')}</h4>
+                  <div className="grid gap-3">
+                    {question.toneOptions.map((option) => {
+                      const toneValue = allAnswers?.tone;
+                      return (
+                        <Card
+                          key={option.value}
+                          className={`cursor-pointer transition-all duration-200 border-2 hover:shadow-glow-secondary ${
+                            toneValue === option.value 
+                              ? 'border-primary bg-primary/10 shadow-glow-primary' 
+                              : 'border-border/50 hover:border-primary/50'
+                          }`}
+                          onClick={() => onAnswer(`${allAnswers?.targetAudience || ''},${option.value}`)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-foreground mb-1">
+                                  {t(option.label)}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {t(option.description)}
+                                </p>
+                              </div>
+                              {toneValue === option.value && (
+                                <div className="p-1 rounded-full bg-gradient-primary">
+                                  <Check className="w-4 h-4 text-primary-foreground" />
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Format Selection */}
+              {question.formatOptions && (
+                <div>
+                  <h4 className="font-semibold text-foreground mb-3">{t('format_best')}</h4>
+                  <div className="grid gap-3">
+                    {question.formatOptions.map((option) => {
+                      const formatValue = allAnswers?.format;
+                      return (
+                        <Card
+                          key={option.value}
+                          className={`cursor-pointer transition-all duration-200 border-2 hover:shadow-glow-secondary ${
+                            formatValue === option.value 
+                              ? 'border-primary bg-primary/10 shadow-glow-primary' 
+                              : 'border-border/50 hover:border-primary/50'
+                          }`}
+                          onClick={() => onAnswer(`${option.value},${allAnswers?.depth || ''}`)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-foreground mb-1">
+                                  {t(option.label)}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {t(option.description)}
+                                </p>
+                              </div>
+                              {formatValue === option.value && (
+                                <div className="p-1 rounded-full bg-gradient-primary">
+                                  <Check className="w-4 h-4 text-primary-foreground" />
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Depth Selection */}
+              {question.depthOptions && (
+                <div>
+                  <h4 className="font-semibold text-foreground mb-3">{t('response_depth')}</h4>
+                  <div className="grid gap-3">
+                    {question.depthOptions.map((option) => {
+                      const depthValue = allAnswers?.depth;
+                      return (
+                        <Card
+                          key={option.value}
+                          className={`cursor-pointer transition-all duration-200 border-2 hover:shadow-glow-secondary ${
+                            depthValue === option.value 
+                              ? 'border-primary bg-primary/10 shadow-glow-primary' 
+                              : 'border-border/50 hover:border-primary/50'
+                          }`}
+                          onClick={() => onAnswer(`${allAnswers?.format || ''},${option.value}`)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-foreground mb-1">
+                                  {t(option.label)}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {t(option.description)}
+                                </p>
+                              </div>
+                              {depthValue === option.value && (
+                                <div className="p-1 rounded-full bg-gradient-primary">
+                                  <Check className="w-4 h-4 text-primary-foreground" />
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Tooltip for combined questions */}
+              {question.tooltip && (
+                <div className="flex items-start gap-2 mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <HelpCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-muted-foreground">
+                    {t(question.tooltip)}
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="grid gap-3">

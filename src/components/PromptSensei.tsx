@@ -12,15 +12,13 @@ import { Brain, Sparkles, LogOut, User } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
 export interface PromptAnswers {
-  question: string;
-  audience: string;
-  tone: string;
-  format: string;
-  complexity: string;
-  depth?: string;
-  polishInput?: string; // "true" or "false" to match select options
-  insightMode?: string;
-  language?: string;
+  questionRaw: string;
+  targetAudience: string;
+  tone: 'friendly' | 'expert' | 'creative' | 'short';
+  format: 'bullet' | 'step' | 'paragraph';
+  depth: 'simple' | 'deep';
+  autoEnhance: boolean;
+  language: string;
 }
 
 // Grammar and polish utility functions with OpenAI fallback
@@ -351,7 +349,7 @@ export async function polishTextAsync(text: string, language?: string): Promise<
 
 const questions = [
   {
-    id: "question",
+    id: "questionRaw",
     title: "what_ask_ai",
     subtitle: "be_specific",
     type: "textarea" as const,
@@ -359,86 +357,50 @@ const questions = [
     tooltip: "tip_details"
   },
   {
-    id: "audience",
-    title: "who_answer_for",
-    subtitle: "tailor_language",
-    type: "select" as const,
-    tooltip: "audience_tooltip",
-    options: [
+    id: "audienceAndTone",
+    title: "audience_and_tone",
+    subtitle: "who_and_how",
+    type: "combined" as const,
+    tooltip: "audience_tone_tooltip",
+    audienceOptions: [
       { value: "myself", label: "myself", description: "myself_desc" },
       { value: "client", label: "my_client", description: "client_desc" },
       { value: "manager", label: "my_manager", description: "manager_desc" },
       { value: "code", label: "code_generation", description: "code_desc" },
       { value: "other", label: "other", description: "other_desc" }
-    ]
-  },
-  {
-    id: "tone",
-    title: "tone_style",
-    subtitle: "tone_controls",
-    type: "select" as const,
-    tooltip: "tone_tooltip",
-    options: [
+    ],
+    toneOptions: [
       { value: "friendly", label: "friendly", description: "friendly_desc" },
       { value: "expert", label: "expert", description: "expert_desc" },
-      { value: "short", label: "short", description: "short_desc" },
-      { value: "creative", label: "creative", description: "creative_desc" }
+      { value: "creative", label: "creative", description: "creative_desc" },
+      { value: "short", label: "short_direct", description: "short_desc" }
     ]
   },
   {
-    id: "format",
-    title: "format_best",
-    subtitle: "format_structured",
-    type: "select" as const,
-    tooltip: "format_tooltip",
-    options: [
+    id: "formatAndDepth",
+    title: "response_format",
+    subtitle: "how_should_response_look",
+    type: "combined" as const,
+    tooltip: "format_depth_tooltip",
+    formatOptions: [
       { value: "bullet", label: "bullet_list", description: "bullet_desc" },
-      { value: "steps", label: "step_by_step", description: "steps_desc" },
+      { value: "step", label: "step_by_step", description: "steps_desc" },
       { value: "paragraph", label: "paragraph", description: "paragraph_desc" }
+    ],
+    depthOptions: [
+      { value: "simple", label: "simple", description: "simple_response_desc" },
+      { value: "deep", label: "deep_insight", description: "deep_insight_desc" }
     ]
   },
   {
-    id: "complexity",
-    title: "how_smart_prompt",
-    subtitle: "ai_experience_level",
+    id: "autoEnhance",
+    title: "optimize_prompt",
+    subtitle: "auto_enhance_question",
     type: "select" as const,
-    tooltip: "complexity_tooltip",
+    tooltip: "auto_enhance_tooltip",
     options: [
-      { value: "optimize", label: "make_smarter", description: "make_smarter_desc" },
-      { value: "simple", label: "keep_clear", description: "keep_clear_desc" }
-    ]
-  },
-  {
-    id: "depth",
-    title: "ai_go_deeper",
-    subtitle: "thorough_analysis",
-    type: "select" as const,
-    tooltip: "deep_search_tooltip",
-    options: [
-      { value: "deep", label: "deep_search", description: "deep_search_desc" },
-      { value: "simple", label: "keep_simple", description: "keep_simple_desc" }
-    ]
-  },
-  {
-    id: "polishInput",
-    title: "polish_input_auto",
-    subtitle: "improve_grammar",
-    type: "select" as const,
-    tooltip: "polish_tooltip",
-    options: [
-      { value: "true", label: "polish_it", description: "polish_desc" },
-      { value: "false", label: "keep_as_is", description: "keep_as_is_desc" }
-    ]
-  },
-  {
-    id: "insightMode",
-    title: "deeper_reasoning",
-    subtitle: "analytical_response",
-    type: "select" as const,
-    tooltip: "insight_tooltip",
-    options: [
-      { value: "deep", label: "deep_insight", description: "deep_insight_desc" },
-      { value: "simple", label: "just_answer", description: "just_answer_desc" }
+      { value: "true", label: "yes_optimize", description: "optimize_desc" },
+      { value: "false", label: "keep_original", description: "keep_original_desc" }
     ]
   },
   {
@@ -471,7 +433,22 @@ export function PromptSensei() {
   };
 
   const handleAnswer = (questionId: string, value: string) => {
-    const updatedAnswers = { ...answers, [questionId]: value };
+    const updatedAnswers = { ...answers } as any;
+    
+    // Handle combined fields
+    if (questionId === 'audienceAndTone') {
+      const [audience, tone] = value.split(',');
+      if (audience) updatedAnswers.targetAudience = audience;
+      if (tone) updatedAnswers.tone = tone;
+    } else if (questionId === 'formatAndDepth') {
+      const [format, depth] = value.split(',');
+      if (format) updatedAnswers.format = format;
+      if (depth) updatedAnswers.depth = depth;
+    } else if (questionId === 'autoEnhance') {
+      updatedAnswers.autoEnhance = value === 'true';
+    } else {
+      updatedAnswers[questionId] = value;
+    }
     
     // Set default language to current UI language if not already set
     if (questionId === 'language' || (!updatedAnswers.language && questionId !== 'language')) {
