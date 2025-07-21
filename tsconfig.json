@@ -22,7 +22,3 @@
   },
   "include": ["src", "tests", "vite.config.ts"]
 }
-The key additions are:
-
-"jsx": "react-jsx" - enables JSX support
-"DOM", "DOM.Iterable" in lib array - provides browser API types
