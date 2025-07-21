@@ -357,19 +357,26 @@ const questions = [
     tooltip: "tip_details"
   },
   {
-    id: "audienceAndTone",
-    title: "audience_and_tone",
-    subtitle: "who_and_how",
-    type: "combined" as const,
-    tooltip: "audience_tone_tooltip",
-    audienceOptions: [
+    id: "targetAudience",
+    title: "who_answer_for",
+    subtitle: "select_target_audience",
+    type: "select" as const,
+    tooltip: "audience_tooltip",
+    options: [
       { value: "myself", label: "myself", description: "myself_desc" },
       { value: "client", label: "my_client", description: "client_desc" },
       { value: "manager", label: "my_manager", description: "manager_desc" },
       { value: "code", label: "code_generation", description: "code_desc" },
       { value: "other", label: "other", description: "other_desc" }
-    ],
-    toneOptions: [
+    ]
+  },
+  {
+    id: "tone",
+    title: "tone_style",
+    subtitle: "select_communication_style",
+    type: "select" as const,
+    tooltip: "tone_tooltip",
+    options: [
       { value: "friendly", label: "friendly", description: "friendly_desc" },
       { value: "expert", label: "expert", description: "expert_desc" },
       { value: "creative", label: "creative", description: "creative_desc" },
@@ -390,17 +397,6 @@ const questions = [
     depthOptions: [
       { value: "simple", label: "simple", description: "simple_response_desc" },
       { value: "deep", label: "deep_insight", description: "deep_insight_desc" }
-    ]
-  },
-  {
-    id: "autoEnhance",
-    title: "optimize_prompt",
-    subtitle: "auto_enhance_question",
-    type: "select" as const,
-    tooltip: "auto_enhance_tooltip",
-    options: [
-      { value: "true", label: "yes_optimize", description: "optimize_desc" },
-      { value: "false", label: "keep_original", description: "keep_original_desc" }
     ]
   },
   {
@@ -432,39 +428,33 @@ export function PromptSensei() {
     setCurrentStep(1);
   };
 
-  const handleAnswer = (questionId: string, value: string) => {
-    const updatedAnswers = { ...answers } as any;
-    
-    // Handle combined fields
-    if (questionId === 'audienceAndTone') {
-      const [audience, tone] = value.split(',');
-      if (audience) updatedAnswers.targetAudience = audience;
-      if (tone) updatedAnswers.tone = tone;
-    } else if (questionId === 'formatAndDepth') {
-      const [format, depth] = value.split(',');
-      if (format) updatedAnswers.format = format;
-      if (depth) updatedAnswers.depth = depth;
-    } else if (questionId === 'autoEnhance') {
-      updatedAnswers.autoEnhance = value === 'true';
-    } else {
-      updatedAnswers[questionId] = value;
+  const handleAnswer = (answer: string) => {
+    if (currentStep === 1) {
+      setAnswers(prev => ({ ...prev, questionRaw: answer }));
+    } else if (currentStep === 2) {
+      setAnswers(prev => ({ ...prev, targetAudience: answer }));
+    } else if (currentStep === 3) {
+      setAnswers(prev => ({ ...prev, tone: answer as PromptAnswers['tone'] }));
+    } else if (currentStep === 4) {
+      // Handle combined format and depth
+      const [format, depth] = answer.split(',');
+      setAnswers(prev => ({ 
+        ...prev, 
+        format: (format || prev.format) as PromptAnswers['format'],
+        depth: (depth || prev.depth) as PromptAnswers['depth']
+      }));
+    } else if (currentStep === 5) {
+      setAnswers(prev => ({ ...prev, language: answer }));
     }
-    
-    // Set default language to current UI language if not already set
-    if (questionId === 'language' || (!updatedAnswers.language && questionId !== 'language')) {
-      const languageMap: Record<string, string> = {
-        'en': 'english',
-        'ru': 'russian', 
-        'es': 'spanish',
-        'de': 'german',
-        'fr': 'french',
-        'zh': 'chinese',
-        'ar': 'auto'
-      };
-      updatedAnswers.language = languageMap[i18n.language] || 'english';
-    }
-    
-    setAnswers(updatedAnswers);
+  };
+
+  const getCurrentAnswer = () => {
+    if (currentStep === 1) return answers.questionRaw || '';
+    if (currentStep === 2) return answers.targetAudience || '';
+    if (currentStep === 3) return answers.tone || '';
+    if (currentStep === 4) return `${answers.format || ''},${answers.depth || ''}`;
+    if (currentStep === 5) return answers.language || '';
+    return '';
   };
 
   const handleNext = () => {
@@ -550,8 +540,8 @@ export function PromptSensei() {
 
         <QuestionStep
           question={currentQuestion}
-          answer={answers[currentQuestion.id as keyof PromptAnswers] as string || ""}
-          onAnswer={(value) => handleAnswer(currentQuestion.id, value)}
+          answer={getCurrentAnswer()}
+          onAnswer={handleAnswer}
           onNext={handleNext}
           onBack={handleBack}
           isFirstStep={currentStep === 1}
