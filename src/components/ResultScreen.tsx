@@ -46,24 +46,24 @@ function detectPersona(question: string): string {
 }
 
 async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage: string): Promise<{ prompt: string; explanation: string; polishInfo?: { original: string; polished: string }; polishAttempted?: boolean }> {
-  const { questionRaw, targetAudience, tone, format, enhancementLevel, deepSearch, polishInput, deepInsight, language } = answers;
+  const { question, audience, tone, format, complexity, depth, polishInput, insightMode, language } = answers;
   
   // Polish the question - always try for English, or if explicitly requested
-  let finalQuestion = questionRaw;
+  let finalQuestion = question;
   let polishInfo: { original: string; polished: string } | undefined;
   let polishAttempted = false;
   
   // Always attempt polish for English language, or if user explicitly requested it
-  if (currentLanguage === 'en' || polishInput) {
+  if (currentLanguage === 'en' || polishInput === "true") {
     polishAttempted = true;
-    console.log('[⚠️ Attempting to polish]', questionRaw, 'Language:', currentLanguage);
-    const { polished, wasPolished } = await polishTextAsync(questionRaw, currentLanguage);
+    console.log('[⚠️ Attempting to polish]', question, 'Language:', currentLanguage);
+    const { polished, wasPolished } = await polishTextAsync(question, currentLanguage);
     if (wasPolished) {
       console.log('[✅ Polish success]', polished);
-      polishInfo = { original: questionRaw, polished };
+      polishInfo = { original: question, polished };
       finalQuestion = polished;
     } else {
-      console.log('[ℹ️ Polish unchanged]', questionRaw);
+      console.log('[ℹ️ Polish unchanged]', question);
     }
   }
   
@@ -153,9 +153,9 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   // Get localized strings or fall back to English
   const currentLocalizedPrompts = localizedPrompts[currentLanguage as keyof typeof localizedPrompts];
 
-  // Expert role enrichment for expert tone with deep insight/analysis needs
-  const shouldAddExpertRole = tone === "expert" && 
-    deepInsight &&
+  // Expert role enrichment for professional tone with deep insight/analysis needs
+  const shouldAddExpertRole = tone === "professional" && 
+    (insightMode === "deep" || depth === "deep") &&
     !finalQuestion.toLowerCase().includes("expert") && 
     !finalQuestion.toLowerCase().includes("консультант") &&
     !finalQuestion.toLowerCase().includes("experto") &&
@@ -174,24 +174,24 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
     he: "אתה יועץ מומחה בעל ידע מעמיק בתחום שלך. "
   };
 
-  // Check if this is a beginner-friendly prompt - not applicable with new structure
-  const isBeginnerPrompt = false;
+  // Check if this is a beginner-friendly prompt
+  const isBeginnerPrompt = tone === "I'm new" || tone === "beginner";
   
   // Auto-detect persona first and add it at the beginning for Russian
   const detectedPersona = detectPersona(finalQuestion);
   let hasPersona = false;
   let expertRoleAdded = false;
   
-  if (detectedPersona && enhancementLevel === 'smart') {
+  if (detectedPersona && complexity === "optimize") {
     prompt += detectedPersona;
     hasPersona = true;
-  } else if (shouldAddExpertRole && enhancementLevel === 'smart' && !isBeginnerPrompt) {
+  } else if (shouldAddExpertRole && complexity === "optimize" && !isBeginnerPrompt) {
     // Add expert role enrichment (but not for beginner prompts)
     const expertPrefix = expertRolePrefixes[currentLanguage as keyof typeof expertRolePrefixes] || expertRolePrefixes.en;
     prompt += expertPrefix;
     hasPersona = true;
     expertRoleAdded = true;
-  } else if (enhancementLevel === 'smart') {
+  } else if (complexity === "optimize") {
     // Use localized persona or fallback to English
     if (currentLocalizedPrompts?.persona[tone as keyof typeof currentLocalizedPrompts.persona]) {
       prompt += currentLocalizedPrompts.persona[tone as keyof typeof currentLocalizedPrompts.persona];
@@ -200,6 +200,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
       // Fallback to English
       switch (tone) {
         case "expert":
+        case "professional":
           prompt += "You are an expert consultant with deep knowledge in your field. ";
           break;
         case "friendly":
@@ -232,12 +233,12 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   }
 
   // Add audience context with localization
-  if (enhancementLevel === 'smart') {
-    if (currentLocalizedPrompts?.audience[targetAudience as keyof typeof currentLocalizedPrompts.audience]) {
-      prompt += currentLocalizedPrompts.audience[targetAudience as keyof typeof currentLocalizedPrompts.audience];
+  if (complexity === "optimize") {
+    if (currentLocalizedPrompts?.audience[audience as keyof typeof currentLocalizedPrompts.audience]) {
+      prompt += currentLocalizedPrompts.audience[audience as keyof typeof currentLocalizedPrompts.audience];
     } else {
       // Fallback to English
-      switch (targetAudience) {
+      switch (audience) {
         case "client":
           prompt += " This response will be shared with a client, so please ensure it's professional and polished.";
           break;
@@ -266,8 +267,8 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
       case "bullet":
         prompt += " Please format your response as a clear bullet list with key points.";
         break;
-      case "step":
-        if (targetAudience === "code") {
+      case "steps":
+        if (audience === "code") {
           prompt += " Break down your response into logical code blocks and describe each step clearly.";
         } else {
           prompt += " Please provide a step-by-step response with numbered instructions.";
@@ -280,7 +281,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   }
 
   // Add tone refinements with localization
-  if (enhancementLevel === 'smart') {
+  if (complexity === "optimize") {
     if (currentLocalizedPrompts?.tone[tone as keyof typeof currentLocalizedPrompts.tone]) {
       prompt += currentLocalizedPrompts.tone[tone as keyof typeof currentLocalizedPrompts.tone];
     } else {
@@ -303,21 +304,21 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   }
 
   // Add DeepSearch modifier (localized)
-  if (deepSearch) {
+  if (depth === "deep") {
     if (currentLanguage === 'ru') {
-      if (targetAudience === "code") {
+      if (audience === "code") {
         prompt += " Включите крайние случаи, соображения производительности и лучшие практики, если применимо. Проанализируйте тему широко и предоставьте подробные объяснения.";
       } else {
         prompt += " Включите выводы, основанные на исследованиях, сравнения, ссылки или реальные примеры по мере необходимости. Проанализируйте тему широко и предоставьте подробные объяснения.";
       }
     } else if (currentLanguage === 'es') {
-      if (targetAudience === "code") {
+      if (audience === "code") {
         prompt += " Incluye casos extremos, consideraciones de rendimiento y mejores prácticas si es aplicable. Analiza el tema ampliamente y proporciona explicaciones completas.";
       } else {
         prompt += " Incluye insights basados en investigación, comparaciones, referencias o ejemplos del mundo real según sea necesario. Analiza el tema ampliamente y proporciona explicaciones completas.";
       }
     } else {
-      if (targetAudience === "code") {
+      if (audience === "code") {
         prompt += " Include edge cases, performance considerations, and best practices if applicable. Analyze the topic broadly and provide thorough explanations.";
       } else {
         prompt += " Include research-based insights, comparisons, references, or real-world examples as needed. Analyze the topic broadly and provide thorough explanations.";
@@ -325,7 +326,16 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
     }
   }
 
-  // Deep Insight Mode is now integrated into depth === "deep" logic above
+  // Add Deep Insight Mode (localized)
+  if (insightMode === "deep") {
+    if (currentLanguage === 'ru') {
+      prompt += " Анализируйте глубоко. Сравнивайте перспективы. Предоставляйте реальные примеры и рассуждения за вашим ответом.";
+    } else if (currentLanguage === 'es') {
+      prompt += " Analiza profundamente. Compara perspectivas. Proporciona ejemplos del mundo real y razonamiento detrás de tu respuesta.";
+    } else {
+      prompt += " Analyze deeply. Compare perspectives. Provide real-world examples and reasoning behind your answer.";
+    }
+  }
 
   // Add clarity and structure suffix for expert role enrichment or beginner-friendly prompts
   let expertClaritySuffix = "";
@@ -344,7 +354,7 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
     };
     
     expertClaritySuffix = clarityStructureSuffixes[currentLanguage as keyof typeof clarityStructureSuffixes] || clarityStructureSuffixes.en;
-  } else if (isBeginnerPrompt && enhancementLevel === 'smart') {
+  } else if (isBeginnerPrompt && polishInput === "true") {
     // Add beginner-friendly clarity suffix when polish is enabled but no expert role is added
     const newbieFriendlySuffixes = {
       en: " Please explain this in a clear and beginner-friendly way. Avoid oversimplification.",
@@ -394,29 +404,31 @@ async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLa
   // Generate explanation in the UI language using translation keys
   explanation = t('why_prompt_works') + `:\n\n`;
   
-  if (detectedPersona && enhancementLevel === 'smart') {
+  if (detectedPersona && complexity === "optimize") {
     explanation += `• **${t('smart_persona_detection')}**: ${t('smart_persona_detection_desc')}\n\n`;
-  } else if (enhancementLevel === 'smart') {
+  } else if (complexity === "optimize") {
     explanation += `• **${t('role_definition')}**: ${t('role_definition_desc', { tone })}\n\n`;
   }
   
   explanation += `• **${t('clear_intent')}**: ${t('clear_intent_desc')}\n\n`;
   
-  if (enhancementLevel === 'smart') {
-    explanation += `• **${t('audience_context')}**: ${t('audience_context_desc', { audience: t(`audience_${targetAudience}`) })}\n\n`;
+  if (complexity === "optimize") {
+    explanation += `• **${t('audience_context')}**: ${t('audience_context_desc', { audience: t(`audience_${audience}`) })}\n\n`;
   }
   
   explanation += `• **${t('format_specification')}**: ${t('format_specification_desc', { format: t(`format_${format}`) })}\n\n`;
   
-  if (enhancementLevel === 'smart') {
+  if (complexity === "optimize") {
     explanation += `• **${t('tone_guidance')}**: ${t('tone_guidance_desc', { tone: t(`tone_${tone}`) })}\n\n`;
   }
 
-  if (deepSearch) {
+  if (depth === "deep") {
     explanation += `• **${t('deepsearch_mode')}**: ${t('deepsearch_mode_desc')}\n\n`;
   }
 
-  // Deep insight is now part of depth === "deep"
+  if (insightMode === "deep") {
+    explanation += `• **${t('deep_insight_mode')}**: ${t('deep_insight_mode_desc')}\n\n`;
+  }
 
   if (!isEnglish) {
     explanation += `• **${t('multilingual_support')}**: ${t('multilingual_support_desc', { language: targetLanguage })}\n\n`;
@@ -450,7 +462,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
       setExplanation(explanation);
       setPolishInfo(polishInfo);
       // Track if polish was attempted but had no effect
-      setPolishAttemptedNoEffect((polishAttempted || false) && !polishInfo);
+      setPolishAttemptedNoEffect(polishAttempted && !polishInfo);
       if (polishAttempted && !polishInfo) {
         console.log('[⚠️ Polish attempted but no changes made]');
       }
@@ -614,16 +626,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
           </Card>
 
           {/* Prompt Quality Meter */}
-          <PromptQualityMeter prompt={prompt} answers={{
-            question: answers.questionRaw,
-            audience: answers.targetAudience,
-            tone: answers.tone,
-            format: answers.format,
-            complexity: answers.enhancementLevel === 'smart' ? 'optimize' : 'simple',
-            depth: answers.deepInsight ? 'deep' : 'simple',
-            polishInput: answers.polishInput ? 'true' : 'false',
-            language: answers.language
-          }} />
+          <PromptQualityMeter prompt={prompt} answers={answers} />
 
           {/* Test with AI */}
           <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
