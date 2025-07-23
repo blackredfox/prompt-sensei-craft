@@ -657,13 +657,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
 
           {/* Test with AI */}
           <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Wand2 className="w-5 h-5 text-primary" />
-                <CardTitle className="text-lg">{t('test_your_prompt')}</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <Button
                 onClick={handleTestWithAI}
                 disabled={loading}
@@ -677,12 +671,10 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
                     <Wand2 className="w-5 h-5 flex-shrink-0" />
                   )}
                   <span className="text-lg font-semibold">
-                    {loading ? t('thinking') : t('test_optimized_prompt_ai')}
+                    {loading ? t('thinking') : t('test_with_ai')}
                   </span>
                 </div>
               </Button>
-
-              <OpenInButtons prompt={prompt} />
 
               {error && (
                 <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm mb-4">
@@ -691,7 +683,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
               )}
               
               {aiResponse && (
-                <div className="p-4 rounded-lg bg-background/50 border border-border/50">
+                <div className="p-4 rounded-lg bg-background/50 border border-border/50 mb-4">
                   <p className="text-sm text-muted-foreground mb-2">{t('ai_response')}</p>
                   <div className="text-foreground leading-relaxed whitespace-pre-wrap">
                     {aiResponse}

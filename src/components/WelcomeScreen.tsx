@@ -23,9 +23,12 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
     const isCurrentLanguageBeta = betaLanguages.includes(i18n.language);
     const hasShownWelcomeBanner = sessionStorage.getItem('welcomeBetaBannerShown');
     
+    console.log('Welcome banner check:', { isCurrentLanguageBeta, hasShownWelcomeBanner, language: i18n.language });
+    
     if (isCurrentLanguageBeta && !hasShownWelcomeBanner) {
       setShowWelcomeBetaBanner(true);
       sessionStorage.setItem('welcomeBetaBannerShown', 'true');
+      console.log('Setting welcome banner to true');
     }
   }, [i18n.language]);
 
