@@ -47,6 +47,8 @@ interface QuestionStepProps {
   isFirstStep: boolean;
   isLastStep: boolean;
   allAnswers?: Record<string, string>;
+  showBetaFeedbackBanner?: boolean;
+  onCloseBetaFeedbackBanner?: () => void;
 }
 
 export function QuestionStep({
@@ -57,7 +59,9 @@ export function QuestionStep({
   onBack,
   isFirstStep,
   isLastStep,
-  allAnswers = {}
+  allAnswers = {},
+  showBetaFeedbackBanner = false,
+  onCloseBetaFeedbackBanner
 }: QuestionStepProps) {
   const { t } = useTranslation();
   
@@ -104,6 +108,34 @@ export function QuestionStep({
             {t(question.subtitle)}
           </p>
         </CardHeader>
+        
+        {/* Beta Feedback Banner for Step 1 */}
+        {isFirstStep && showBetaFeedbackBanner && (
+          <div className="mx-6 mb-6 p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-950/20 dark:border-amber-800 dark:text-amber-200">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-medium mb-1">
+                  ⚠ This language is currently in BETA.
+                </p>
+                <p className="text-sm">
+                  If you notice any issues or translation inconsistencies, we'd love to hear from you!
+                  Please send your feedback to <span className="font-medium">promptsensei.feedback@gmail.com</span>.
+                </p>
+              </div>
+              {onCloseBetaFeedbackBanner && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onCloseBetaFeedbackBanner}
+                  className="text-amber-600 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-100 p-1 h-auto"
+                >
+                  ×
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
         
         <CardContent className="space-y-6">
           {question.type === "textarea" ? (

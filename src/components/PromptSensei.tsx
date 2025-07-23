@@ -413,6 +413,8 @@ export function PromptSensei() {
   const [answers, setAnswers] = useState<Partial<PromptAnswers>>({});
   const [showBetaBanner, setShowBetaBanner] = useState(false);
   const [betaBannerShown, setBetaBannerShown] = useState(false);
+  const [showBetaFeedbackBanner, setShowBetaFeedbackBanner] = useState(false);
+  const [betaFeedbackBannerShown, setBetaFeedbackBannerShown] = useState(false);
   const { user, signOut, loading } = useAuth();
   const { t, i18n } = useTranslation();
 
@@ -483,6 +485,7 @@ export function PromptSensei() {
     setCurrentStep(0);
     setAnswers({});
     setShowBetaBanner(false);
+    setShowBetaFeedbackBanner(false);
   };
 
   const handleLanguageSelect = (language: string) => {
@@ -493,6 +496,12 @@ export function PromptSensei() {
     if (language !== 'english' && language !== 'auto' && !betaBannerShown) {
       setShowBetaBanner(true);
       setBetaBannerShown(true);
+    }
+    
+    // Show feedback banner for BETA languages on Step 1 (once per session)
+    if (language !== 'english' && language !== 'auto' && !betaFeedbackBannerShown) {
+      setShowBetaFeedbackBanner(true);
+      setBetaFeedbackBannerShown(true);
     }
   };
 
@@ -707,6 +716,8 @@ export function PromptSensei() {
           isFirstStep={currentStep === 1}
           isLastStep={currentStep === 5}
           allAnswers={answers as Record<string, string>}
+          showBetaFeedbackBanner={showBetaFeedbackBanner}
+          onCloseBetaFeedbackBanner={() => setShowBetaFeedbackBanner(false)}
         />
       </div>
     </div>
