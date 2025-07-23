@@ -12,15 +12,12 @@ import { Brain, Sparkles, LogOut, User } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
 export interface PromptAnswers {
-  question: string;
-  audience: string;
+  questionRaw: string;
+  targetAudience: string;
   tone: string;
   format: string;
-  complexity: string;
-  depth?: string;
-  polishInput?: string; // "true" or "false" to match select options
-  insightMode?: string;
-  language?: string;
+  generationMode: 'deep_search' | 'optimize' | 'simple';
+  language: string;
 }
 
 // Grammar and polish utility functions with OpenAI fallback
@@ -351,15 +348,15 @@ export async function polishTextAsync(text: string, language?: string): Promise<
 
 const questions = [
   {
-    id: "question",
+    id: "questionRaw",
     title: "what_ask_ai",
     subtitle: "be_specific",
     type: "textarea" as const,
     placeholder: "placeholder_example",
-    tooltip: "tip_details"
+    tooltip: "tip_details_enhanced"
   },
   {
-    id: "audience",
+    id: "targetAudience",
     title: "who_answer_for",
     subtitle: "tailor_language",
     type: "select" as const,
@@ -398,71 +395,24 @@ const questions = [
     ]
   },
   {
-    id: "complexity",
-    title: "how_smart_prompt",
-    subtitle: "ai_experience_level",
+    id: "generationMode",
+    title: "ai_go_deeper_combined",
+    subtitle: "choose_enhancement_level",
     type: "select" as const,
-    tooltip: "complexity_tooltip",
+    tooltip: "generation_mode_tooltip",
     options: [
-      { value: "optimize", label: "make_smarter", description: "make_smarter_desc" },
-      { value: "simple", label: "keep_clear", description: "keep_clear_desc" }
-    ]
-  },
-  {
-    id: "depth",
-    title: "ai_go_deeper",
-    subtitle: "thorough_analysis",
-    type: "select" as const,
-    tooltip: "deep_search_tooltip",
-    options: [
-      { value: "deep", label: "deep_search", description: "deep_search_desc" },
-      { value: "simple", label: "keep_simple", description: "keep_simple_desc" }
-    ]
-  },
-  {
-    id: "polishInput",
-    title: "polish_input_auto",
-    subtitle: "improve_grammar",
-    type: "select" as const,
-    tooltip: "polish_tooltip",
-    options: [
-      { value: "true", label: "polish_it", description: "polish_desc" },
-      { value: "false", label: "keep_as_is", description: "keep_as_is_desc" }
-    ]
-  },
-  {
-    id: "insightMode",
-    title: "deeper_reasoning",
-    subtitle: "analytical_response",
-    type: "select" as const,
-    tooltip: "insight_tooltip",
-    options: [
-      { value: "deep", label: "deep_insight", description: "deep_insight_desc" },
-      { value: "simple", label: "just_answer", description: "just_answer_desc" }
-    ]
-  },
-  {
-    id: "language",
-    title: "language_respond",
-    subtitle: "preferred_response_lang",
-    type: "select" as const,
-    tooltip: "language_tooltip",
-    options: [
-      { value: "english", label: "english", description: "english_desc" },
-      { value: "spanish", label: "spanish", description: "spanish_desc" },
-      { value: "french", label: "french", description: "french_desc" },
-      { value: "german", label: "german", description: "german_desc" },
-      { value: "russian", label: "russian", description: "russian_desc" },
-      { value: "chinese", label: "chinese", description: "chinese_desc" },
-      { value: "japanese", label: "japanese", description: "japanese_desc" },
-      { value: "auto", label: "auto_detect", description: "auto_detect_desc" }
+      { value: "deep_search", label: "deep_search_combined", description: "deep_search_combined_desc" },
+      { value: "optimize", label: "make_it_smarter", description: "make_it_smarter_desc" },
+      { value: "simple", label: "keep_it_simple", description: "keep_it_simple_desc" }
     ]
   }
 ];
 
 export function PromptSensei() {
-  const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1-6 = questions, 7 = result
+  const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1-5 = questions, 6 = language, 7 = result
   const [answers, setAnswers] = useState<Partial<PromptAnswers>>({});
+  const [showBetaBanner, setShowBetaBanner] = useState(false);
+  const [betaBannerShown, setBetaBannerShown] = useState(false);
   const { user, signOut, loading } = useAuth();
   const { t, i18n } = useTranslation();
 
@@ -470,11 +420,30 @@ export function PromptSensei() {
     setCurrentStep(1);
   };
 
-  const handleAnswer = (questionId: string, value: string) => {
+  const handleAnswer = async (questionId: string, value: string) => {
     const updatedAnswers = { ...answers, [questionId]: value };
     
+    // Auto-apply polish for step 1 (questionRaw) - silently polish if English
+    if (questionId === 'questionRaw' && value.trim()) {
+      try {
+        const detectedLanguage = i18n.language;
+        console.log('[🔧 Auto-polish] Processing text:', value, 'detected language:', detectedLanguage);
+        
+        if (detectedLanguage === 'en') {
+          const { polished } = await polishTextAsync(value, 'en');
+          updatedAnswers.questionRaw = polished;
+          console.log('[✨ Auto-polish] Applied:', polished);
+        } else {
+          updatedAnswers.questionRaw = value;
+        }
+      } catch (error) {
+        console.error('[❌ Auto-polish error]', error);
+        updatedAnswers.questionRaw = value;
+      }
+    }
+    
     // Set default language to current UI language if not already set
-    if (questionId === 'language' || (!updatedAnswers.language && questionId !== 'language')) {
+    if (!updatedAnswers.language) {
       const languageMap: Record<string, string> = {
         'en': 'english',
         'ru': 'russian', 
@@ -482,7 +451,9 @@ export function PromptSensei() {
         'de': 'german',
         'fr': 'french',
         'zh': 'chinese',
-        'ar': 'auto'
+        'ar': 'auto',
+        'ja': 'japanese',
+        'he': 'auto'
       };
       updatedAnswers.language = languageMap[i18n.language] || 'english';
     }
@@ -491,10 +462,14 @@ export function PromptSensei() {
   };
 
   const handleNext = () => {
-    if (currentStep < questions.length) {
+    if (currentStep < 5) {
       setCurrentStep(prev => prev + 1);
+    } else if (currentStep === 5) {
+      // Go to language selection
+      setCurrentStep(6);
     } else {
-      setCurrentStep(questions.length + 1); // Go to result
+      // Go to result
+      setCurrentStep(7);
     }
   };
 
@@ -507,18 +482,170 @@ export function PromptSensei() {
   const handleRestart = () => {
     setCurrentStep(0);
     setAnswers({});
+    setShowBetaBanner(false);
+  };
+
+  const handleLanguageSelect = (language: string) => {
+    const updatedAnswers = { ...answers, language };
+    setAnswers(updatedAnswers);
+    
+    // Show beta banner for non-English languages (once per session)
+    if (language !== 'english' && language !== 'auto' && !betaBannerShown) {
+      setShowBetaBanner(true);
+      setBetaBannerShown(true);
+    }
   };
 
   if (currentStep === 0) {
     return <WelcomeScreen onStart={handleStart} />;
   }
 
-  if (currentStep === questions.length + 1) {
+  if (currentStep === 6) {
+    // Language selection step
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Progress bar */}
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <div className="h-1 bg-muted">
+            <div 
+              className="h-full bg-gradient-primary transition-all duration-500 ease-out"
+              style={{ width: `${(5 / 5) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="container max-w-3xl mx-auto px-4 py-8 pt-16">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-gradient-primary">
+                  <Brain className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  PromptSensei
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <LanguageSwitcher />
+                {user && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <User className="w-4 h-4" />
+                      <span>{user.email}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={signOut}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <Badge variant="secondary" className="mb-4">
+              {t('step_of', { current: 5, total: 5 })} - {t('language_respond')}
+            </Badge>
+          </div>
+
+          {/* Beta banner */}
+          {showBetaBanner && (
+            <div className="mb-6 p-4 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-200">
+              <div className="flex items-center gap-2">
+                <span>🌐</span>
+                <span className="text-sm">
+                  {t('beta_translation_warning')}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowBetaBanner(false)}
+                  className="ml-auto text-yellow-600 hover:text-yellow-800 dark:text-yellow-300 dark:hover:text-yellow-100"
+                >
+                  ×
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Language Selection */}
+          <Card className="border-accent/20">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-2xl font-semibold text-foreground mb-2">
+                {t('language_respond')}
+              </CardTitle>
+              <p className="text-muted-foreground">
+                {t('preferred_response_lang')}
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3">
+                {[
+                  { value: 'english', label: t('english'), desc: t('english_desc'), beta: false },
+                  { value: 'spanish', label: t('spanish'), desc: t('spanish_desc'), beta: true },
+                  { value: 'french', label: t('french'), desc: t('french_desc'), beta: true },
+                  { value: 'german', label: t('german'), desc: t('german_desc'), beta: true },
+                  { value: 'russian', label: t('russian'), desc: t('russian_desc'), beta: true },
+                  { value: 'chinese', label: t('chinese'), desc: t('chinese_desc'), beta: true },
+                  { value: 'japanese', label: t('japanese'), desc: t('japanese_desc'), beta: true },
+                  { value: 'auto', label: t('auto_detect'), desc: t('auto_detect_desc'), beta: false }
+                ].map((option) => (
+                  <Button
+                    key={option.value}
+                    variant={answers.language === option.value ? "default" : "outline"}
+                    className="justify-start h-auto p-4 text-left"
+                    onClick={() => handleLanguageSelect(option.value)}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <div>
+                        <div className="flex items-center gap-2 font-medium">
+                          {option.label}
+                          {option.beta && (
+                            <Badge variant="secondary" className="text-xs">
+                              BETA
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {option.desc}
+                        </div>
+                      </div>
+                    </div>
+                  </Button>
+                ))}
+              </div>
+
+              <div className="flex gap-3 mt-8">
+                <Button variant="outline" onClick={handleBack} className="flex-1">
+                  {t('back')}
+                </Button>
+                <Button 
+                  onClick={handleNext} 
+                  className="flex-1"
+                  disabled={!answers.language}
+                >
+                  {t('show_perfect_prompt')}
+                  <Sparkles className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentStep === 7) {
     return <ResultScreen answers={answers as PromptAnswers} onRestart={handleRestart} />;
   }
 
   const currentQuestion = questions[currentStep - 1];
-  const progress = (currentStep / questions.length) * 100;
+  const progress = (currentStep / 5) * 100;
 
   return (
     <div className="min-h-screen bg-background">
@@ -566,9 +693,9 @@ export function PromptSensei() {
             </div>
           </div>
           
-          <Badge variant="secondary" className="mb-4">
-            {t('step_of', { current: currentStep, total: questions.length })}
-          </Badge>
+            <Badge variant="secondary" className="mb-4">
+              {t('step_of', { current: currentStep, total: 5 })}
+            </Badge>
         </div>
 
         <QuestionStep
@@ -578,7 +705,7 @@ export function PromptSensei() {
           onNext={handleNext}
           onBack={handleBack}
           isFirstStep={currentStep === 1}
-          isLastStep={currentStep === questions.length}
+          isLastStep={currentStep === 5}
           allAnswers={answers as Record<string, string>}
         />
       </div>

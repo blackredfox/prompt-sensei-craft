@@ -251,5 +251,16 @@
   "deep_insight": "Deep Insight",
   "deep_insight_desc": "Provide detailed analysis, reasoning, and comprehensive explanations",
   "just_answer": "Just Answer",
-  "just_answer_desc": "Provide straightforward, direct responses without extensive analysis"
+  "just_answer_desc": "Provide straightforward, direct responses without extensive analysis",
+  "tip_details_enhanced": "💡 Tip: The more details you provide, the more helpful the AI can be. We'll automatically polish your input for grammar and clarity.",
+  "ai_go_deeper_combined": "Would you like the AI to go deeper?",
+  "choose_enhancement_level": "Choose your preferred AI enhancement level",
+  "generation_mode_tooltip": "Deep Search combines thorough research with analytical insights. Smart optimization adds context and structure. Simple keeps it straightforward.",
+  "deep_search_combined": "🔎 Deep Search",
+  "deep_search_combined_desc": "Enable thorough research, analytical thinking, and comprehensive insights",
+  "make_it_smarter": "✨ Just Make it Smarter",
+  "make_it_smarter_desc": "Add context, structure, and optimization for better AI responses",
+  "keep_it_simple": "🎯 Keep it Simple",
+  "keep_it_simple_desc": "Direct and straightforward approach without extra complexity",
+  "beta_translation_warning": "This translation is still in beta — help us improve by reporting issues."
 }

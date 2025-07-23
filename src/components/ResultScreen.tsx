@@ -46,7 +46,16 @@ function detectPersona(question: string): string {
 }
 
 async function generateOptimizedPrompt(answers: PromptAnswers, t: any, currentLanguage: string): Promise<{ prompt: string; explanation: string; polishInfo?: { original: string; polished: string }; polishAttempted?: boolean }> {
-  const { question, audience, tone, format, complexity, depth, polishInput, insightMode, language } = answers;
+  // Transform new interface to work with existing logic
+  const question = answers.questionRaw;
+  const audience = answers.targetAudience;
+  const tone = answers.tone;
+  const format = answers.format;
+  const complexity = answers.generationMode === 'optimize' ? 'optimize' : 'simple';
+  const depth = answers.generationMode === 'deep_search' ? 'deep' : 'simple';
+  const polishInput = 'true'; // Always true since we polish silently
+  const insightMode = answers.generationMode === 'deep_search' ? 'deep' : 'simple';
+  const language = answers.language;
   
   // Polish the question - always try for English, or if explicitly requested
   let finalQuestion = question;
@@ -462,7 +471,7 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
       setExplanation(explanation);
       setPolishInfo(polishInfo);
       // Track if polish was attempted but had no effect
-      setPolishAttemptedNoEffect(polishAttempted && !polishInfo);
+      setPolishAttemptedNoEffect(Boolean(polishAttempted && !polishInfo));
       if (polishAttempted && !polishInfo) {
         console.log('[⚠️ Polish attempted but no changes made]');
       }
@@ -626,7 +635,16 @@ export function ResultScreen({ answers, onRestart }: ResultScreenProps) {
           </Card>
 
           {/* Prompt Quality Meter */}
-          <PromptQualityMeter prompt={prompt} answers={answers} />
+          <PromptQualityMeter prompt={prompt} answers={{
+            question: answers.questionRaw,
+            audience: answers.targetAudience,
+            tone: answers.tone,
+            format: answers.format,
+            complexity: answers.generationMode === 'optimize' ? 'optimize' : 'simple',
+            depth: answers.generationMode === 'deep_search' ? 'deep' : 'simple',
+            polishInput: 'true',
+            language: answers.language
+          }} />
 
           {/* Test with AI */}
           <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
