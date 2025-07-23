@@ -5,6 +5,8 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Brain, Sparkles, Zap, Target, MessageSquare, Smile, Code2, SearchCheck, Languages, Edit3, Settings, Rocket, LogIn, LogOut, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
+import { X, AlertTriangle } from 'lucide-react';
 
 interface WelcomeScreenProps {
   onStart: () => void;
@@ -12,7 +14,20 @@ interface WelcomeScreenProps {
 
 export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   const { user, signOut } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [showWelcomeBetaBanner, setShowWelcomeBetaBanner] = useState(false);
+
+  // Check if current language is BETA and show banner once per session
+  useEffect(() => {
+    const betaLanguages = ['ru', 'es', 'de', 'fr', 'zh', 'ar', 'ja', 'he'];
+    const isCurrentLanguageBeta = betaLanguages.includes(i18n.language);
+    const hasShownWelcomeBanner = sessionStorage.getItem('welcomeBetaBannerShown');
+    
+    if (isCurrentLanguageBeta && !hasShownWelcomeBanner) {
+      setShowWelcomeBetaBanner(true);
+      sessionStorage.setItem('welcomeBetaBannerShown', 'true');
+    }
+  }, [i18n.language]);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -54,6 +69,28 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           )}
         </div>
       </div>
+
+      {/* BETA Language Banner */}
+      {showWelcomeBetaBanner && (
+        <div className="relative z-40 border-b border-border bg-amber-50 dark:bg-amber-950/20">
+          <div className="container max-w-6xl mx-auto px-4 py-3">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              <p className="text-sm text-amber-800 dark:text-amber-200 flex-1">
+                {t('beta_version_notice')}
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowWelcomeBetaBanner(false)}
+                className="text-amber-600 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-100 p-1 h-auto"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="relative container max-w-6xl mx-auto px-4 py-12">
         {/* Hero Section */}

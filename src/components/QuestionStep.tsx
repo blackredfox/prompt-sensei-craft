@@ -65,6 +65,21 @@ export function QuestionStep({
 }: QuestionStepProps) {
   const { t } = useTranslation();
   
+  // Check for audience-tone warnings
+  const getWarning = () => {
+    if (question.id === 'tone' && allAnswers.targetAudience && answer) {
+      if (allAnswers.targetAudience === 'client' && answer === 'short') {
+        return t('warning_client_short_tone');
+      }
+      if (allAnswers.targetAudience === 'manager' && answer === 'friendly') {
+        return t('warning_manager_friendly_tone');
+      }
+    }
+    return null;
+  };
+
+  const warning = getWarning();
+  
   // Enhanced canProceed logic for combined fields
   const canProceed = (() => {
     if (question.type === "combined") {

@@ -499,7 +499,8 @@ export function PromptSensei() {
     }
     
     // Show feedback banner for BETA languages on Step 1 (once per session)
-    if (language !== 'english' && language !== 'auto' && !betaFeedbackBannerShown) {
+    // Also trigger for auto-detect since it's marked as BETA
+    if ((language !== 'english') && !betaFeedbackBannerShown) {
       setShowBetaFeedbackBanner(true);
       setBetaFeedbackBannerShown(true);
     }

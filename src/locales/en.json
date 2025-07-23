@@ -262,5 +262,11 @@
   "make_it_smarter_desc": "Add context, structure, and optimization for better AI responses",
   "keep_it_simple": "🎯 Keep it Simple",
   "keep_it_simple_desc": "Direct and straightforward approach without extra complexity",
-  "beta_translation_warning": "This translation is still in beta — help us improve by reporting issues."
+  "beta_translation_warning": "This translation is still in beta — help us improve by reporting issues.",
+  "beta_version_notice": "This version is still in BETA. If you notice any issues, please email us at promptsensei.feedback@gmail.com.",
+  "beta_translation_notice": "🌐 This translation is still in beta — help us improve by reporting issues.",
+  "feedback_improvement_note": "We're continuously improving PromptSensei. If you have suggestions, please email: promptsensei.feedback@gmail.com",
+  "test_optimized_prompt_ai": "Test your optimized prompt with AI",
+  "warning_client_short_tone": "Short tone might feel too blunt for client deliverables",
+  "warning_manager_friendly_tone": "Consider using a more formal tone for workplace communication"
 }
