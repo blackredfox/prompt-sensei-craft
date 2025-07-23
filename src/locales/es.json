@@ -186,5 +186,12 @@
   "adaptive_feedback_specificity": "Agrega solicitudes específicas como 'incluye ejemplos' o 'explica cómo'",
   "adaptive_feedback_context": "Considera especificar tu audiencia o habilitar el modo DeepSearch",
   "beginner_tip_title": "💡 Consejo para principiantes",
-  "beginner_tip_body": "Estás usando configuraciones para principiantes. Para obtener mejores resultados, prueba habilitar 'Análisis profundo' o elegir un tono profesional."
+  "beginner_tip_body": "Estás usando configuraciones para principiantes. Para obtener mejores resultados, prueba habilitar 'Análisis profundo' o elegir un tono profesional.",
+  "beta_version_notice": "Esta versión está aún en BETA. Si notas algún problema, por favor envíanos un email a promptsensei.feedback@gmail.com.",
+  "feedback_improvement_note": "Estamos mejorando continuamente PromptSensei. Si tienes sugerencias, por favor envía un email a: promptsensei.feedback@gmail.com",
+  "warning_client_short_tone": "El tono corto puede parecer demasiado directo para entregables de clientes",
+  "warning_manager_friendly_tone": "Considera usar un tono más formal para comunicación laboral",
+  "auto_detect_beta_tooltip": "Funciona mejor con inglés; puede clasificar mal entradas cortas",
+  "grok_copy_notice": "¡Prompt copiado! Pégalo manualmente después de la redirección.",
+  "gemini_copy_notice": "¡Prompt copiado! Pégalo manualmente después de la redirección."
 }

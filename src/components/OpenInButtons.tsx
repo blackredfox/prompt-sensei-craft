@@ -21,6 +21,22 @@ export function OpenInButtons({ prompt }: OpenInButtonsProps) {
       grok: `https://grok.com/?referrer=website`,
     };
     
+    // For Gemini and Grok, copy the prompt and show a toast notification
+    if (platform === 'gemini' || platform === 'grok') {
+      navigator.clipboard.writeText(prompt).then(() => {
+        toast({
+          title: t('prompt_copied'),
+          description: t(`${platform}_copy_notice`),
+        });
+      }).catch(() => {
+        toast({
+          title: t('copy_failed'),
+          description: t('copy_failed_desc'),
+          variant: "destructive",
+        });
+      });
+    }
+    
     if (urls[platform]) {
       window.open(urls[platform], "_blank", "noopener,noreferrer");
     }

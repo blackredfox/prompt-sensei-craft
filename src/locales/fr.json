@@ -181,5 +181,12 @@
   "excellent_prompt": "Excellent prompt",
   "excellent_prompt_desc": "Ceci devrait générer des réponses de haute qualité et ciblées de tout assistant IA.",
   "beginner_tip_title": "💡 Conseil pour débutants",
-  "beginner_tip_body": "Vous utilisez des paramètres adaptés aux débutants. Pour de meilleurs résultats, essayez d'activer 'Analyse approfondie' ou de choisir un ton professionnel."
+  "beginner_tip_body": "Vous utilisez des paramètres adaptés aux débutants. Pour de meilleurs résultats, essayez d'activer 'Analyse approfondie' ou de choisir un ton professionnel.",
+  "beta_version_notice": "Cette version est encore en BETA. Si vous remarquez des problèmes, veuillez nous envoyer un email à promptsensei.feedback@gmail.com.",
+  "feedback_improvement_note": "Nous améliorons continuellement PromptSensei. Si vous avez des suggestions, veuillez envoyer un email à : promptsensei.feedback@gmail.com",
+  "warning_client_short_tone": "Un ton court pourrait sembler trop abrupt pour les livrables clients",
+  "warning_manager_friendly_tone": "Considérez utiliser un ton plus formel pour la communication professionnelle",
+  "auto_detect_beta_tooltip": "Fonctionne mieux avec l'anglais ; peut mal classifier les entrées courtes",
+  "grok_copy_notice": "Prompt copié ! Collez-le manuellement après la redirection.",
+  "gemini_copy_notice": "Prompt copié ! Collez-le manuellement après la redirection."
 }

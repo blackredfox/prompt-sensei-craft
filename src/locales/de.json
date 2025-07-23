@@ -181,5 +181,12 @@
   "excellent_prompt": "Exzellenter Prompt",
   "excellent_prompt_desc": "Dies sollte hochwertige, zielgerichtete Antworten von jedem KI-Assistenten generieren.",
   "beginner_tip_title": "💡 Tipp für Anfänger",
-  "beginner_tip_body": "Sie verwenden anfängerfreundliche Einstellungen. Für noch bessere Ergebnisse versuchen Sie 'Tiefe Analyse' zu aktivieren oder einen professionellen Ton zu wählen."
+  "beginner_tip_body": "Sie verwenden anfängerfreundliche Einstellungen. Für noch bessere Ergebnisse versuchen Sie 'Tiefe Analyse' zu aktivieren oder einen professionellen Ton zu wählen.",
+  "beta_version_notice": "Diese Version ist noch in BETA. Wenn Sie Probleme bemerken, senden Sie uns bitte eine E-Mail an promptsensei.feedback@gmail.com.",
+  "feedback_improvement_note": "Wir verbessern PromptSensei kontinuierlich. Wenn Sie Vorschläge haben, senden Sie uns bitte eine E-Mail an: promptsensei.feedback@gmail.com",
+  "warning_client_short_tone": "Ein kurzer Ton könnte für Kundenlieferungen zu abrupt wirken",
+  "warning_manager_friendly_tone": "Verwenden Sie einen formelleren Ton für die Kommunikation am Arbeitsplatz",
+  "auto_detect_beta_tooltip": "Funktioniert am besten mit Englisch; kann kurze Eingaben falsch klassifizieren",
+  "grok_copy_notice": "Prompt kopiert! Fügen Sie ihn nach der Weiterleitung manuell ein.",
+  "gemini_copy_notice": "Prompt kopiert! Fügen Sie ihn nach der Weiterleitung manuell ein."
 }

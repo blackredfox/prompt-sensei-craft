@@ -563,7 +563,7 @@ export function PromptSensei() {
             </Badge>
           </div>
 
-          {/* Beta banner */}
+          {/* Beta banner - now uses selected language */}
           {showBetaBanner && (
             <div className="mb-6 p-4 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-200">
               <div className="flex items-center gap-2">
@@ -603,7 +603,7 @@ export function PromptSensei() {
                   { value: 'russian', label: t('russian'), desc: t('russian_desc'), beta: true },
                   { value: 'chinese', label: t('chinese'), desc: t('chinese_desc'), beta: true },
                   { value: 'japanese', label: t('japanese'), desc: t('japanese_desc'), beta: true },
-                  { value: 'auto', label: t('auto_detect'), desc: t('auto_detect_desc'), beta: false }
+                  { value: 'auto', label: t('auto_detect'), desc: t('auto_detect_desc'), beta: true }
                 ].map((option) => (
                   <Button
                     key={option.value}
@@ -612,17 +612,22 @@ export function PromptSensei() {
                     onClick={() => handleLanguageSelect(option.value)}
                   >
                     <div className="flex items-center justify-between w-full">
-                      <div>
+                      <div className="flex-1">
                         <div className="flex items-center gap-2 font-medium">
                           {option.label}
                           {option.beta && (
-                            <Badge variant="secondary" className="text-xs">
-                              BETA
-                            </Badge>
+                            <span className="text-xs font-medium text-red-400 uppercase tracking-wide">
+                              [BETA]
+                            </span>
                           )}
                         </div>
                         <div className="text-sm text-muted-foreground mt-1">
                           {option.desc}
+                          {option.value === 'auto' && (
+                            <div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                              {t('auto_detect_beta_tooltip')}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
